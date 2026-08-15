@@ -1,0 +1,5 @@
+[
+  { "event": "CONSENT_WITHDRAWN", "sms": true, "email": true, "topic": "egov.core.notification.sms" },
+  { "event": "RIGHTS_COMPLETED", "sms": true, "email": true, "topic": "egov.core.notification.sms" },
+  { "event": "INCIDENT_CREATED", "sms": false, "email": true, "topic": "egov.core.notification.email" }
+]

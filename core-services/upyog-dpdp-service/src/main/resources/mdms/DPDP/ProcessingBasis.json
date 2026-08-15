@@ -1,0 +1,6 @@
+[
+  { "code": "CONSENT", "name": "Consent of the data principal", "consentRequired": true },
+  { "code": "LEGAL_OBLIGATION", "name": "Legal obligation", "consentRequired": false },
+  { "code": "STATUTORY_FUNCTION", "name": "Statutory municipal function", "consentRequired": false },
+  { "code": "OTHER_PERMITTED_USE", "name": "Other permitted use", "consentRequired": false }
+]
