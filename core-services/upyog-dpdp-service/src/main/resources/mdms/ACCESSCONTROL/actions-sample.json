@@ -1,0 +1,13 @@
+{
+  "tenantId": "pg",
+  "moduleName": "ACCESSCONTROL-ACTIONS-TEST",
+  "actions-test": [
+    { "id": 91001, "name": "DPDP Consent Create", "url": "/upyog-dpdp-service/consent/v1/_create", "servicecode": "DPDP", "enabled": true },
+    { "id": 91002, "name": "DPDP Consent Search", "url": "/upyog-dpdp-service/consent/v1/_search", "servicecode": "DPDP", "enabled": true },
+    { "id": 91003, "name": "DPDP Consent Withdraw", "url": "/upyog-dpdp-service/consent/v1/_withdraw", "servicecode": "DPDP", "enabled": true },
+    { "id": 91004, "name": "DPDP Scan Create", "url": "/upyog-dpdp-service/scan/v1/_create", "servicecode": "DPDP", "enabled": true },
+    { "id": 91005, "name": "DPDP Compliance Summary", "url": "/upyog-dpdp-service/compliance/v1/_summary", "servicecode": "DPDP", "enabled": true },
+    { "id": 91006, "name": "DPDP Rights Create", "url": "/upyog-dpdp-service/rights/v1/_create", "servicecode": "DPDP", "enabled": true },
+    { "id": 91007, "name": "DPDP Incident Create", "url": "/upyog-dpdp-service/incident/v1/_create", "servicecode": "DPDP", "enabled": true }
+  ]
+}
