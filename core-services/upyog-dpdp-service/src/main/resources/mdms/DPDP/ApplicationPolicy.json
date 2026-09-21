@@ -1,0 +1,6 @@
+[
+  { "applicationCode": "PT", "serviceName": "property-services", "defaultPurpose": "PROPERTY_TAX_SERVICE", "failMode": "FAIL_OPEN" },
+  { "applicationCode": "TL", "serviceName": "tl-services", "defaultPurpose": "TRADE_LICENSE_SERVICE", "failMode": "FAIL_OPEN" },
+  { "applicationCode": "PGR", "serviceName": "pgr-services", "defaultPurpose": "OPTIONAL_ALERTS", "failMode": "FAIL_CLOSED" },
+  { "applicationCode": "USER", "serviceName": "egov-user", "defaultPurpose": "USER_PROFILE", "failMode": "FAIL_CLOSED" }
+]

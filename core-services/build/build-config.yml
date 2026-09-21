@@ -284,4 +284,17 @@ config:
         image-name: "egov-document-uploader"
         dockerfile: "build/maven/Dockerfile"
       - work-dir: "egov-document-uploader/src/main/resources/db"
-        image-name: "egov-document-uploader-db"     
+        image-name: "egov-document-uploader-db"
+
+  - name: "builds/core-services/upyog-dpdp-service"
+    build:
+      - work-dir: "upyog-dpdp-service"
+        image-name: "upyog-dpdp-service"
+        dockerfile: "build/maven/Dockerfile"
+      - work-dir: "upyog-dpdp-service/src/main/resources/db"
+        image-name: "upyog-dpdp-service-db"
+
+  - name: "builds/core-services/libraries/dpdp-spring-boot-starter"
+    build:
+      - work-dir: "libraries/dpdp-spring-boot-starter"
+        image-name: "dpdp-spring-boot-starter" 
