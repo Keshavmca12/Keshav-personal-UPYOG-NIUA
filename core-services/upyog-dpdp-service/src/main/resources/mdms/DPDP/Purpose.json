@@ -1,0 +1,37 @@
+[
+  {
+    "code": "PROPERTY_TAX_SERVICE",
+    "name": "Property tax service delivery",
+    "processingBasis": "STATUTORY_FUNCTION",
+    "applicationCode": "PT",
+    "retentionPolicy": "PROPERTY_TAX_DEFAULT",
+    "dataFields": [
+      { "field": "name", "classification": "PERSONAL", "required": true, "justified": true },
+      { "field": "mobileNumber", "classification": "PERSONAL", "required": true, "justified": true },
+      { "field": "address", "classification": "PERSONAL", "required": true, "justified": true },
+      { "field": "propertyId", "classification": "INTERNAL", "required": true, "justified": true },
+      { "field": "aadhaar", "classification": "HIGH_RISK_PERSONAL", "required": false, "justified": false }
+    ]
+  },
+  {
+    "code": "TRADE_LICENSE_SERVICE",
+    "name": "Trade licence service delivery",
+    "processingBasis": "STATUTORY_FUNCTION",
+    "applicationCode": "TL",
+    "retentionPolicy": "TRADE_LICENSE_DEFAULT",
+    "dataFields": [
+      { "field": "name", "classification": "PERSONAL", "required": true, "justified": true },
+      { "field": "mobileNumber", "classification": "PERSONAL", "required": true, "justified": true }
+    ]
+  },
+  {
+    "code": "OPTIONAL_ALERTS",
+    "name": "Optional citizen alerts",
+    "processingBasis": "CONSENT",
+    "applicationCode": "PGR",
+    "retentionPolicy": "ALERTS_DEFAULT",
+    "dataFields": [
+      { "field": "mobileNumber", "classification": "PERSONAL", "required": true, "justified": true }
+    ]
+  }
+]
