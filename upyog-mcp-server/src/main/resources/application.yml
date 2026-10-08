@@ -55,9 +55,10 @@ logging:
 
 upyog:
   mcp:
-    gateway-base-url: ${UPYOG_GATEWAY_BASE_URL:http://localhost:8080}
-    ui-base-url: ${UPYOG_UI_BASE_URL:http://localhost:3000}
-    token-secret: ${UPYOG_MCP_TOKEN_SECRET:}
+    # Local defaults point at NIUA UAT. Override with env vars in other environments.
+    gateway-base-url: ${UPYOG_GATEWAY_BASE_URL:https://niuatt.niua.in}
+    ui-base-url: ${UPYOG_UI_BASE_URL:https://niuatt.niua.in}
+    token-secret: ${UPYOG_MCP_TOKEN_SECRET:local-dev-only-change-me-32chars}
     confirmation-ttl: ${UPYOG_MCP_CONFIRMATION_TTL:5m}
     read-timeout: ${UPYOG_MCP_READ_TIMEOUT:8s}
     write-timeout: ${UPYOG_MCP_WRITE_TIMEOUT:20s}
@@ -67,7 +68,8 @@ upyog:
     max-free-text-chars: 1000
     max-upload-bytes: 2000000
     rate-limit-per-minute: 60
-    trust-gateway-identity: ${UPYOG_MCP_TRUST_GATEWAY_IDENTITY:true}
+    # Direct Postman/local MCP on :8088. Kubernetes sets this to true.
+    trust-gateway-identity: ${UPYOG_MCP_TRUST_GATEWAY_IDENTITY:false}
     redis:
       enabled: ${REDIS_ENABLED:false}
       uri: ${REDIS_URI:redis://localhost:6379}

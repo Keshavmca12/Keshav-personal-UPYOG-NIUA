@@ -323,13 +323,110 @@ Read timeout is 8 seconds. Write timeout is 20 seconds. Reads may retry once. Wr
 
 Add `src/main/resources/descriptors/<module>.yaml`. Keep the gateway path on `upyog.mcp.allowed-gateway-prefixes`. Writes must set `requiresConfirmation: true`. Do not add a new MCP tool. `mvn test` lints descriptors. An invalid descriptor aborts startup.
 
-### Local run
+### Local run (NIUA UAT)
+
+`application.yml` defaults:
+
+| Setting | Value |
+|---|---|
+| Gateway (downstream calls) | `https://niuatt.niua.in` |
+| UI (payment links) | `https://niuatt.niua.in` (citizen page is `/upyog-ui/citizen/`) |
+| Trust gateway identity | `false` so Postman can hit `http://localhost:8088/mcp` directly |
 
 ```bash
-export UPYOG_MCP_TOKEN_SECRET="$(openssl rand -hex 32)"
-export UPYOG_GATEWAY_BASE_URL=http://localhost:8080
+cd upyog-mcp-server
 mvn spring-boot:run
 ```
+
+MCP listens on `http://localhost:8088/mcp`. It still calls UAT through `https://niuatt.niua.in/...` for `/user/_details` and business APIs. The UAT gateway route `/upyog-mcp-server/**` is not required for this local test.
+
+Get a citizen token from [NIUA UAT citizen](https://niuatt.niua.in/upyog-ui/citizen/): log in, then copy `Auth-Token` (or access token) from DevTools → Network on any API call.
+
+#### Postman
+
+URL: `POST http://localhost:8088/mcp`
+
+Headers:
+
+```text
+Content-Type: application/json
+Accept: application/json, text/event-stream
+auth-token: <paste-citizen-access-token>
+x-correlation-id: local-test-1
+```
+
+**1. Initialize**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": "2025-03-26",
+    "capabilities": {},
+    "clientInfo": { "name": "postman", "version": "1.0.0" }
+  }
+}
+```
+
+If the response has `Mcp-Session-Id`, copy it into the next request header.
+
+**2. List services**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "list_services",
+    "arguments": {}
+  }
+}
+```
+
+**3. Search property** (replace `tenantId` and `propertyIds` with a record the token can access)
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "method": "tools/call",
+  "params": {
+    "name": "search",
+    "arguments": {
+      "service": "property",
+      "filters": {
+        "tenantId": "pg.citya",
+        "propertyIds": ["PT-107-001834"]
+      },
+      "page": 0,
+      "size": 20
+    }
+  }
+}
+```
+
+**4. Pending bill**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 4,
+  "method": "tools/call",
+  "params": {
+    "name": "get_pending_bill",
+    "arguments": {
+      "businessService": "PT",
+      "consumerCode": "PT-107-001834",
+      "tenantId": "pg.citya"
+    }
+  }
+}
+```
+
+More request/response samples are in `docs/chatbot-team-guide.md` section 6.1.
 
 ### Test, Docker, Kubernetes
 

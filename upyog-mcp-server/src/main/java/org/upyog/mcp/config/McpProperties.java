@@ -13,8 +13,8 @@ import java.util.List;
 @ConfigurationProperties(prefix = "upyog.mcp")
 public class McpProperties {
 
-    private String gatewayBaseUrl = "http://localhost:8080";
-    private String uiBaseUrl = "http://localhost:3000";
+    private String gatewayBaseUrl = "https://niuatt.niua.in";
+    private String uiBaseUrl = "https://niuatt.niua.in";
     private String tokenSecret = "";
     private Duration confirmationTtl = Duration.ofMinutes(5);
     private Duration readTimeout = Duration.ofSeconds(8);
