@@ -25,6 +25,12 @@ public class RateLimitService {
         this.registry = RateLimiterRegistry.of(config);
     }
 
+    /**
+     * Blocks when the per-user minute cap is exceeded.
+     *
+     * @param userId typically {@link org.upyog.mcp.web.AuthenticatedUser#getUuid()}
+     * @throws McpException with code {@code RATE_LIMITED} when denied
+     */
     public void acquire(String userId) {
         RateLimiter limiter = registry.rateLimiter(userId);
         if (!limiter.acquirePermission()) {

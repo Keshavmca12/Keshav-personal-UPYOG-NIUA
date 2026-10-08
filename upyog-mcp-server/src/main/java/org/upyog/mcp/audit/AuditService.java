@@ -30,6 +30,11 @@ public class AuditService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Emits one structured audit line to the {@code AUDIT} logger.
+     *
+     * @param outcome success code or {@link org.upyog.mcp.service.McpException#getCode()}
+     */
     public void record(AuthenticatedUser user, String service, String operation, String tenant,
                        JsonNode arguments, String outcome, long latencyMs) {
         try {

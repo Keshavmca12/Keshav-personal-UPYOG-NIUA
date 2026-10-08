@@ -39,6 +39,10 @@ public class RestGatewayClient implements GatewayClient {
     private final CircuitBreakerRegistry circuitBreakers;
     private final RetryRegistry retries;
 
+    /**
+     * @param readClient  RestClient with read timeout and retry policy
+     * @param writeClient RestClient with write timeout; no retries on POST writes
+     */
     public RestGatewayClient(RestClient readClient, RestClient writeClient, ObjectMapper objectMapper,
                              CircuitBreakerRegistry circuitBreakers) {
         this.readClient = readClient;

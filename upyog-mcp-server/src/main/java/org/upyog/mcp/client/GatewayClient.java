@@ -11,8 +11,21 @@ import java.util.Map;
  */
 public interface GatewayClient {
 
+    /**
+     * POST JSON to a fixed gateway-relative path.
+     *
+     * @param gatewayPath path from a descriptor (never caller-supplied host)
+     * @param query       repeated query parameters
+     * @param body        full request including {@code RequestInfo}
+     * @param read        when {@code true}, retries and read timeouts apply; writes are never retried
+     */
     JsonNode postJson(String gatewayPath, Map<String, List<String>> query, JsonNode body, boolean read);
 
+    /**
+     * Uploads a document to filestore before a confirmed write.
+     *
+     * @param module filestore module from the descriptor ({@code PGR}, …)
+     */
     JsonNode postFile(String gatewayPath, String tenantId, String module, String fileName,
                       String contentType, byte[] content);
 }

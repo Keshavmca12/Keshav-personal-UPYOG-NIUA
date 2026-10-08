@@ -32,6 +32,7 @@ import java.util.List;
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class AuthTokenFilter extends OncePerRequestFilter {
 
+    /** HTTP header name for the UPYOG session access token. */
     public static final String HEADER = "auth-token";
 
     private final GatewayClient gatewayClient;
@@ -41,11 +42,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             .maximumSize(10_000)
             .build();
 
+    /**
+     * @param gatewayClient client used to call {@code POST /user/_details}
+     * @param objectMapper  JSON serializer for error responses
+     */
     public AuthTokenFilter(GatewayClient gatewayClient, ObjectMapper objectMapper) {
         this.gatewayClient = gatewayClient;
         this.objectMapper = objectMapper;
     }
 
+    /** Applies only to {@code /mcp} routes; health and actuator paths skip token validation. */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();

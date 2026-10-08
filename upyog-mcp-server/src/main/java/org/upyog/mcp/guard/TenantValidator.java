@@ -12,6 +12,11 @@ import org.upyog.mcp.web.AuthenticatedUser;
 @Component
 public class TenantValidator {
 
+    /**
+     * Ensures the business {@code tenantId} is within the signed-in user's tenant hierarchy.
+     *
+     * @throws IllegalArgumentException when {@code tenantId} is blank or not permitted
+     */
     public void requireAllowed(AuthenticatedUser user, String tenantId) {
         if (tenantId == null || tenantId.isBlank()) {
             throw new IllegalArgumentException("tenantId is required");
@@ -30,6 +35,9 @@ public class TenantValidator {
         throw new IllegalArgumentException("tenant is outside the signed-in user context");
     }
 
+    /**
+     * @return {@code true} when {@code requested} equals {@code allowed} or is a child tenant ({@code pg.citya} under {@code pg})
+     */
     static boolean covers(String allowed, String requested) {
         if (allowed == null || allowed.isBlank()) {
             return false;

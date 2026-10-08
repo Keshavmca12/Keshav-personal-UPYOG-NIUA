@@ -140,8 +140,11 @@ public class McpProperties {
         this.allowedGatewayPrefixes = allowedGatewayPrefixes;
     }
 
+    /** Redis settings for single-use confirmation tokens and idempotent write results. */
     public static class Redis {
+        /** When false, {@link org.upyog.mcp.guard.RejectingSingleUseStore} blocks {@code confirm_action}. */
         private boolean enabled;
+        /** Lettuce connection URI ({@code REDIS_URI} / {@code upyog.mcp.redis.uri}). */
         private String uri = "redis://localhost:6379";
 
         public boolean isEnabled() {

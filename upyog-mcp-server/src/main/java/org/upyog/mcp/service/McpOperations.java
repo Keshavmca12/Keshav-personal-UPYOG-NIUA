@@ -54,6 +54,9 @@ public class McpOperations {
     private final ObjectMapper objectMapper;
     private final RateLimitService rateLimitService;
 
+    /**
+     * Spring-injected orchestrator; all MCP business logic flows through this bean.
+     */
     public McpOperations(DescriptorRegistry registry, GatewayClient gatewayClient, RequestInfoBuilder requestInfoBuilder,
                          BodyBuilder bodyBuilder, SchemaValidator schemaValidator, ResponseProjector responseProjector,
                          PiiMasker piiMasker, TenantValidator tenantValidator, ConfirmationTokenService confirmationTokenService,
@@ -74,6 +77,7 @@ public class McpOperations {
         this.rateLimitService = rateLimitService;
     }
 
+    /** @return services and operation names visible to the current user's roles */
     public Map<String, Object> listServices() {
         AuthenticatedUser user = currentUser();
         List<Map<String, Object>> services = new ArrayList<>();
@@ -91,6 +95,7 @@ public class McpOperations {
         return Map.of("services", services, "correlationId", RequestInfoBuilder.correlationId());
     }
 
+    /** @return input schema and hints for one operation; gateway paths are not exposed */
     public Map<String, Object> describe(String serviceId, String operationName) {
         currentUser();
         ServiceDescriptor.OperationDescriptor operation = operation(serviceId, operationName);
@@ -108,6 +113,7 @@ public class McpOperations {
         return body;
     }
 
+    /** @return allow-listed MDMS master rows with PII masked and {@code untrustedData: true} */
     public Map<String, Object> lookupMaster(String serviceId, String masterName, String tenantId) {
         AuthenticatedUser user = currentUser();
         tenantValidator.requireAllowed(user, tenantId);
@@ -135,6 +141,11 @@ public class McpOperations {
         );
     }
 
+    /**
+     * Runs a descriptor read search with validated filters and pagination caps.
+     *
+     * @return projected {@code items}, optional {@code count}, {@code untrustedData}, and {@code correlationId}
+     */
     public Map<String, Object> search(String serviceId, JsonNode filters, Integer page, Integer size) {
         AuthenticatedUser user = currentUser();
         ServiceDescriptor.OperationDescriptor operation = readOperation(serviceId, "search");
@@ -149,6 +160,7 @@ public class McpOperations {
         return objectMapper.convertValue(projected, Map.class);
     }
 
+    /** Delegates to search using the descriptor's status argument (for example {@code serviceRequestId}). */
     public Map<String, Object> status(String serviceId, String id, String tenantId) {
         AuthenticatedUser user = currentUser();
         ServiceDescriptor service = registry.require(serviceId);

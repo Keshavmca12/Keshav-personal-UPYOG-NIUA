@@ -29,11 +29,17 @@ public class DescriptorLoader {
         this.properties = properties;
     }
 
+    /** Loads and validates descriptors before the server accepts MCP traffic. */
     @Bean
     ApplicationRunner loadDescriptors() {
         return args -> registry.replace(read("classpath:descriptors/*.yaml"));
     }
 
+    /**
+     * Reads every YAML file matching {@code pattern}, validates, and returns parsed services.
+     *
+     * @param pattern Spring resource pattern (for example {@code classpath:descriptors/*.yaml})
+     */
     public List<ServiceDescriptor> read(String pattern) throws IOException {
         DescriptorValidator validator = new DescriptorValidator(properties);
         Resource[] resources = new PathMatchingResourcePatternResolver().getResources(pattern);

@@ -31,6 +31,11 @@ public class ConfirmationTokenService {
         this.properties = properties;
     }
 
+    /**
+     * Signs a confirmation token binding user, service, operation, tenant, payload hash, expiry, and {@code jti}.
+     *
+     * @param businessBody gateway-ready body produced by {@link org.upyog.mcp.registry.BodyBuilder}; stored in claims
+     */
     public Issued issue(AuthenticatedUser user, String service, String operation, String tenant, ObjectNode businessBody) {
         try {
             String payloadHash = sha256(canonical(businessBody));
@@ -52,6 +57,12 @@ public class ConfirmationTokenService {
         }
     }
 
+    /**
+     * Verifies signature, expiry, user binding, and payload hash integrity.
+     *
+     * @return decoded claims including the stored {@code body} node
+     * @throws IllegalArgumentException when the token is invalid, expired, or tampered
+     */
     public ObjectNode verify(String token, AuthenticatedUser user) {
         int dot = token == null ? -1 : token.lastIndexOf('.');
         if (dot <= 0) {
@@ -111,6 +122,13 @@ public class ConfirmationTokenService {
         return MessageDigest.isEqual(left.getBytes(StandardCharsets.UTF_8), right.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * @param token       opaque value returned to the assistant as {@code confirmationToken}
+     * @param expiresAt   UTC instant after which confirm must be rejected
+     * @param payloadHash canonical SHA-256 of the business body
+     * @param jti         single-use id consumed in Redis on confirm
+     * @param body        exact downstream JSON body to post on confirm
+     */
     public record Issued(String token, Instant expiresAt, String payloadHash, String jti, ObjectNode body) {
     }
 }

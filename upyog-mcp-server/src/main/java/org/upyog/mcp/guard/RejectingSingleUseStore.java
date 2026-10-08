@@ -9,6 +9,7 @@ import java.util.Optional;
  */
 public class RejectingSingleUseStore implements SingleUseStore {
 
+    /** Always throws; confirm must not run without Redis. */
     @Override
     public boolean consumeOnce(String key, Duration ttl) {
         throw new IllegalStateException("Redis is required for single-use confirmation tokens");

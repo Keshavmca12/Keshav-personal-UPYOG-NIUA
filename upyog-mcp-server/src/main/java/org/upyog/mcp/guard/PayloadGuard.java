@@ -20,6 +20,12 @@ public final class PayloadGuard {
     private PayloadGuard() {
     }
 
+    /**
+     * Walks the payload tree and rejects keys that would let the assistant override identity or transport.
+     *
+     * @param node validated business payload from an MCP tool
+     * @throws IllegalArgumentException when a forbidden field name appears at any depth
+     */
     public static void rejectForbidden(JsonNode node) {
         walk(node);
     }

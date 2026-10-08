@@ -10,9 +10,12 @@ import java.util.Map;
 /**
  * One UPYOG module loaded from {@code src/main/resources/descriptors}.
  * Adding a normal module is a new YAML file, not a new MCP tool.
+ * <p>
+ * Jackson maps YAML properties to the fields below; getters and setters exist for deserialization only.
  */
 public class ServiceDescriptor {
 
+    /** Stable service id passed as the MCP {@code service} argument ({@code pgr}, {@code property}, …). */
     private String id;
     private String displayName;
     private String description;
@@ -68,8 +71,11 @@ public class ServiceDescriptor {
         this.operations = operations;
     }
 
+    /** Allow-listed MDMS module and master name exposed through {@code lookup_master}. */
     public static class MasterRef {
+        /** MDMS module name (for example {@code RAINMAKER-PGR}). */
         private String module;
+        /** Master detail name (for example {@code ServiceDefs}). */
         private String name;
 
         public String getModule() {
@@ -89,7 +95,12 @@ public class ServiceDescriptor {
         }
     }
 
+    /**
+     * One read or write operation under a service. Gateway path and templates are server-side only;
+     * the assistant sees {@link #getInputSchema()} via {@code describe_operation}.
+     */
     public static class OperationDescriptor {
+        /** Operation key ({@code search}, {@code create}, …). */
         private String name;
         private String description;
         private String type;

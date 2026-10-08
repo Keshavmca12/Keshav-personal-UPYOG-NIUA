@@ -27,6 +27,11 @@ public class ResponseProjector {
         this.properties = properties;
     }
 
+    /**
+     * Projects downstream JSON to descriptor {@code response.keep} fields and applies PII masking.
+     *
+     * @param responseSpec descriptor {@code response} node; may be null to pass through masked data
+     */
     public ObjectNode project(JsonNode downstream, JsonNode responseSpec) {
         ObjectNode result = objectMapper.createObjectNode();
         result.put("untrustedData", true);
@@ -107,6 +112,7 @@ public class ResponseProjector {
         return result;
     }
 
+    /** Reads a dotted status field from a projected item, or returns null when missing. */
     public String statusOf(JsonNode item, String statusField) {
         if (statusField == null || statusField.isBlank()) {
             return null;

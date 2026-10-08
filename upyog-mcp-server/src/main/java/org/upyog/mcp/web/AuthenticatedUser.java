@@ -17,6 +17,14 @@ public final class AuthenticatedUser {
     private final List<String> roleTenants;
     private final String authToken;
 
+    /**
+     * @param uuid        egov-user uuid from {@code /user/_details}
+     * @param type        user type (for example CITIZEN, EMPLOYEE)
+     * @param tenantId    primary tenant on the user record
+     * @param roleCodes   role codes from the user profile
+     * @param roleTenants tenant id bound to each role
+     * @param authToken   session access token; used only when building {@code RequestInfo}
+     */
     public AuthenticatedUser(String uuid, String type, String tenantId, List<String> roleCodes,
                              List<String> roleTenants, String authToken) {
         this.uuid = uuid;
@@ -27,30 +35,40 @@ public final class AuthenticatedUser {
         this.authToken = authToken;
     }
 
+    /** @return egov-user uuid */
     public String getUuid() {
         return uuid;
     }
 
+    /** @return user type from egov-user */
     public String getType() {
         return type;
     }
 
+    /** @return primary tenant id on the user record */
     public String getTenantId() {
         return tenantId;
     }
 
+    /** @return immutable list of role codes */
     public List<String> getRoleCodes() {
         return roleCodes;
     }
 
+    /** @return immutable list of tenant ids associated with roles */
     public List<String> getRoleTenants() {
         return roleTenants;
     }
 
+    /** @return UPYOG access token for gateway {@code RequestInfo.authToken} */
     public String getAuthToken() {
         return authToken;
     }
 
+    /**
+     * @param code role code to test (case-insensitive)
+     * @return {@code true} when the user holds that role
+     */
     public boolean hasRole(String code) {
         return roleCodes.stream().anyMatch(role -> role.equalsIgnoreCase(code));
     }

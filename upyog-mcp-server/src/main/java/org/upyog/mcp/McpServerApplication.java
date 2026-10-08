@@ -15,6 +15,11 @@ import org.upyog.mcp.config.McpProperties;
 @EnableConfigurationProperties(McpProperties.class)
 public class McpServerApplication {
 
+    /**
+     * Bootstraps Spring Boot, loads descriptors, and starts Streamable HTTP MCP on {@code /mcp}.
+     *
+     * @param args standard Spring Boot command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(McpServerApplication.class, args);
     }

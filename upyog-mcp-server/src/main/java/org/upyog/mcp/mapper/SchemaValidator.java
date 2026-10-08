@@ -26,6 +26,10 @@ public class SchemaValidator {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * @param schema  descriptor {@code inputSchema}
+     * @param payload MCP tool arguments after forbidden-field stripping
+     */
     public void validate(JsonNode schema, JsonNode payload) {
         JsonSchema compiled = factory.getSchema(schema);
         Set<ValidationMessage> messages = compiled.validate(payload);
@@ -35,6 +39,7 @@ public class SchemaValidator {
         }
     }
 
+    /** Deep-copies an object node or returns an empty object when the input is not an object. */
     public ObjectNode copyObject(JsonNode node) {
         if (node instanceof ObjectNode objectNode) {
             return objectNode.deepCopy();

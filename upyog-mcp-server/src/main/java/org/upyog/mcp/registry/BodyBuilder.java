@@ -20,6 +20,14 @@ public class BodyBuilder {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Resolves a descriptor request or query template into JSON using payload, pagination, and user uuid.
+     *
+     * @param template YAML {@code requestBody} or {@code query} node
+     * @param payload  validated MCP tool input
+     * @param limit    page size for {@code $page} size directive
+     * @param offset   row offset for {@code $page} offset directive
+     */
     public ObjectNode build(JsonNode template, JsonNode payload, AuthenticatedUser user, int limit, int offset) {
         JsonNode built = resolve(template, payload, user, limit, offset);
         if (built instanceof ObjectNode objectNode) {

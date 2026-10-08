@@ -17,6 +17,7 @@ public class RedisSingleUseStore implements SingleUseStore, AutoCloseable {
     private final RedisClient client;
     private final StatefulRedisConnection<String, String> connection;
 
+    /** Opens a Lettuce connection using {@link McpProperties#getRedis()}. */
     public RedisSingleUseStore(McpProperties properties) {
         this.client = RedisClient.create(properties.getRedis().getUri());
         this.connection = client.connect();
@@ -43,6 +44,7 @@ public class RedisSingleUseStore implements SingleUseStore, AutoCloseable {
         return true;
     }
 
+    /** Closes the Redis connection when the Spring context shuts down. */
     @Override
     public void close() {
         connection.close();

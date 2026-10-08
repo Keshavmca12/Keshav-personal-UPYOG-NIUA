@@ -20,6 +20,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Fixed MCP tool surface. Module behavior comes from descriptors, not from extra tools.
  * Every call is audited with redacted arguments and the correlation id.
+ * <p>
+ * Tool methods delegate to {@link McpOperations} and map {@link McpException} to the standard error map
+ * ({@code code}, {@code message}, {@code retryable}, {@code suggestedNextStep}, {@code correlationId}).
  */
 @Component
 public class GenericMcpTools {
@@ -29,6 +32,7 @@ public class GenericMcpTools {
     private final ObjectMapper objectMapper;
     private final MeterRegistry meterRegistry;
 
+    /** Creates the MCP tool bean wired by Spring AI MCP server auto-configuration. */
     public GenericMcpTools(McpOperations operations, AuditService auditService, ObjectMapper objectMapper,
                            MeterRegistry meterRegistry) {
         this.operations = operations;
@@ -37,6 +41,7 @@ public class GenericMcpTools {
         this.meterRegistry = meterRegistry;
     }
 
+    /** @return catalog of service ids, display names, and operation names */
     @McpTool(name = "list_services", description = "List UPYOG services and operations available to the signed-in user.",
             annotations = @McpTool.McpAnnotations(readOnlyHint = true, destructiveHint = false, idempotentHint = true))
     public Map<String, Object> listServices() {

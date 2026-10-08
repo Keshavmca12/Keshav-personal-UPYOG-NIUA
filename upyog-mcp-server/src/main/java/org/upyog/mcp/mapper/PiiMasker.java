@@ -22,6 +22,11 @@ public class PiiMasker {
     private static final Set<String> ID_KEYS = Set.of("aadhaar", "aadhaarnumber", "aadharnumber");
     private static final Set<String> NAME_KEYS = Set.of("name", "applicantname", "ownername", "username");
 
+    /**
+     * Recursively masks known PII fields in place.
+     *
+     * @param maskNames when {@code true}, personal names are partially masked
+     */
     public JsonNode mask(JsonNode node, boolean maskNames) {
         return walk(node, maskNames);
     }

@@ -23,6 +23,7 @@ import java.util.UUID;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorrelationIdFilter extends OncePerRequestFilter {
 
+    /** Incoming or outgoing correlation header echoed on every HTTP response. */
     public static final String HEADER = "x-correlation-id";
 
     @Override

@@ -24,6 +24,9 @@ public class DescriptorValidator {
         this.properties = properties;
     }
 
+    /**
+     * Validates one service descriptor; throws {@link IllegalStateException} on any policy violation.
+     */
     public void validate(ServiceDescriptor service) {
         require(service.getId(), "service id");
         require(service.getDisplayName(), "displayName");
@@ -115,6 +118,7 @@ public class DescriptorValidator {
         throw new IllegalStateException("Invalid descriptor [" + serviceId + "]: " + message);
     }
 
+    /** Lowercases and trims a string for safe comparisons (for example forbidden field names). */
     public static String normalize(String value) {
         return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
