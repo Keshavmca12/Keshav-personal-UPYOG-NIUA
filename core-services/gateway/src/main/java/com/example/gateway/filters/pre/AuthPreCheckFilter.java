@@ -2,6 +2,7 @@ package com.example.gateway.filters.pre;
 
 import com.example.gateway.config.ApplicationProperties;
 import com.example.gateway.filters.pre.helpers.AuthPreCheckFilterHelper;
+import com.example.gateway.utils.UpyogMcpGatewaySupport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -43,6 +44,10 @@ public class AuthPreCheckFilter implements GlobalFilter, Ordered {
         if (applicationProperties.getOpenEndpointsWhitelist().contains(endPointPath)) {
             exchange.getAttributes().put(AUTH_BOOLEAN_FLAG_NAME, Boolean.FALSE);
             log.info(OPEN_ENDPOINT_MESSAGE, endPointPath);
+            return chain.filter(exchange);
+        }
+        if (UpyogMcpGatewaySupport.isMcpPath(endPointPath)) {
+            exchange.getAttributes().put(AUTH_BOOLEAN_FLAG_NAME, Boolean.TRUE);
             return chain.filter(exchange);
         }
         else {
