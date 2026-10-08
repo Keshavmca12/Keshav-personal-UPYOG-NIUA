@@ -1,6 +1,6 @@
 # UPYOG MCP — guide for the chatbot team
 
-The integration steps, headers, tool catalog, and error contract are in [README.md](../README.md). This file keeps the evaluation prompts.
+The integration steps, headers, tool catalog, error contract, and **two-hop gateway flow** (chatbot → gateway → MCP → gateway → services) are in [README.md](../README.md#request-flow). This file keeps the evaluation prompts.
 
 Status: **contract for review.** The MCP server tools listed below match the implementation. Venue cancel is not offered yet.
 

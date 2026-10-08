@@ -41,6 +41,105 @@ If you omit `x-correlation-id`, the server creates one and returns it on the HTT
 
 Use the environment gateway base URL. For local MCP-only debugging without the gateway, use `http://localhost:8088/mcp`, `auth-token`, and `UPYOG_MCP_TRUST_GATEWAY_IDENTITY=false`.
 
+## Request flow
+
+Production traffic uses **two passes through the API gateway**. MCP is not a replacement for gateway auth or access-control; it is a **descriptor-driven client** that exposes a safe tool surface to the assistant.
+
+```mermaid
+sequenceDiagram
+    participant Bot as Chatbot
+    participant GW as API gateway
+    participant MCP as upyog-mcp-server
+    participant Svc as UPYOG services
+
+    Bot->>GW: POST /upyog-mcp-server/mcp (Auth-Token, JSON-RPC)
+    Note over GW: Hop 1: token, user, RBAC on /upyog-mcp-server/mcp
+    GW->>MCP: /mcp (x-user-info, x-pass-through-gateway, Auth-Token)
+    Note over MCP: Tool call: validate, tenant, descriptors
+    MCP->>GW: POST e.g. /property-services/property/_search (RequestInfo)
+    Note over GW: Hop 2: enrich userInfo, RBAC on business path
+    GW->>Svc: Forward request
+    Svc-->>Bot: Response via GW and MCP (masked JSON)
+```
+
+ASCII overview:
+
+```text
+Chatbot  --Auth-Token-->  Gateway  --x-user-info + Auth-Token-->  MCP (/mcp)
+MCP      --RequestInfo.authToken-->  Gateway (RBAC)  -->  PGR / property / billing / …
+```
+
+### Hop 1 — Chatbot → gateway → MCP
+
+| Step | What happens |
+|------|----------------|
+| URL | `POST {gateway}/upyog-mcp-server/mcp` (Streamable HTTP / JSON-RPC: `initialize`, `tools/call`, …) |
+| Headers | `Auth-Token` (citizen session, same as UI), optional `x-correlation-id` |
+| Gateway auth | Token from header; MCP JSON-RPC body has **no** `RequestInfo` |
+| Gateway RBAC | Access-control on URI **`/upyog-mcp-server/mcp`** (needs MDMS role-action for chatbot roles) |
+| To MCP | Gateway does **not** inject `RequestInfo` into JSON-RPC; forwards `Auth-Token`, `x-user-info`, `x-pass-through-gateway: true` |
+| Routing | Gateway `StripPrefix=1`: `/upyog-mcp-server/mcp` → MCP `/mcp` |
+| MCP inbound | With `UPYOG_MCP_TRUST_GATEWAY_IDENTITY=true`, MCP trusts gateway headers and skips `/user/_details` on this hop |
+
+### Inside MCP — one tool invocation
+
+The assistant uses only the [nine tools](#tools) below. MCP does **not** call access-control per tool; it prepares safe outbound gateway calls.
+
+| Step | Purpose |
+|------|---------|
+| Payload guard | Reject `RequestInfo`, URLs, fake `uuid` / `roles` in tool arguments |
+| JSON schema | Only fields allowed by the descriptor |
+| Tenant validator | Business `tenantId` must match user / role tenant hierarchy |
+| Descriptor | Fixed gateway path and body template (assistant cannot choose URLs) |
+| RequestInfo builder | Server adds `RequestInfo` with the real `authToken` |
+| Response | Project to allow-listed fields, mask PII, set `untrustedData` on citizen text |
+
+**Reads** (`search`, `get_status`, `lookup_master`, bills, payment link): validate → one gateway POST → return masked result.
+
+**Writes**: `prepare_action` validates and returns summary + confirmation token (**no** business write). After explicit user consent, `confirm_action` posts the **exact** body stored in the token once (Redis single-use).
+
+`list_services` may hide modules using `allowedRolesHint` in YAML; that is catalog UX only. Permission for each API is decided on hop 2.
+
+### Hop 2 — MCP → gateway → business service
+
+Every downstream call uses `UPYOG_GATEWAY_BASE_URL` (cluster gateway URL), **not** direct pod DNS.
+
+Example (property search):
+
+- Path: `POST /property-services/property/_search`
+- Body: `{ "RequestInfo": { "authToken": "…" }, … }` built by MCP
+- Query: filters from the tool (`tenantId`, `propertyIds`, pagination)
+
+The gateway enriches `RequestInfo.userInfo`, runs RBAC on that path, and forwards to the service—the same as the web UI. MCP maps 401/403 to tool errors such as `NOT_AUTHORIZED`.
+
+### Who owns what
+
+| Concern | Owner |
+|---------|--------|
+| May this user call MCP? | Gateway hop 1 + MDMS action for `/upyog-mcp-server/mcp` |
+| May this user call PGR / property / billing? | Gateway hop 2 + MDMS per service URL |
+| Which path and fields? | MCP descriptors (fixed; not chosen by the model) |
+| Prepare / confirm / no payment in chat | MCP tools and confirmation tokens |
+| Tenant in tool args | MCP `TenantValidator` early; gateway tenant rules on hop 2 |
+
+### Walkthrough — “Show my property PT-107-001834”
+
+1. Voice bot calls `tools/call` → `search` with `service=property` and filters on **gateway** `/upyog-mcp-server/mcp`.
+2. Gateway authenticates and authorizes the MCP endpoint → forwards to MCP.
+3. MCP validates tenant and filters → `POST` gateway `/property-services/property/_search` with server-built `RequestInfo`.
+4. Gateway authenticates and authorizes property search → property-service → MCP masks PII → bot replies to the citizen.
+
+A **create** flow adds `lookup_master` / `prepare_action` (hop 2 reads only), user confirms, then `confirm_action` → one `pgr-services/.../_create` on hop 2.
+
+### Local development without gateway on hop 1
+
+| Mode | MCP URL | Headers | MCP env |
+|------|---------|---------|---------|
+| Production-like | `{gateway}/upyog-mcp-server/mcp` | `Auth-Token` | `UPYOG_MCP_TRUST_GATEWAY_IDENTITY=true` (default) |
+| Direct MCP | `http://localhost:8088/mcp` | `auth-token` | `UPYOG_MCP_TRUST_GATEWAY_IDENTITY=false` |
+
+Hop 2 still uses the gateway for business APIs unless you change that separately.
+
 ## Tools
 
 Call only these tools. Do not invent `create_pgr`, `pay_property_tax`, or similar.
@@ -174,7 +273,7 @@ Show `message` and `suggestedNextStep`. Do not retry when `retryable` is false. 
 
 | `code` | What to do |
 |---|---|
-| `AUTHENTICATION_REQUIRED` / `AUTHENTICATION_FAILED` | Ask the user to sign in again and pass a fresh `auth-token` |
+| `AUTHENTICATION_REQUIRED` / `AUTHENTICATION_FAILED` | Ask the user to sign in again; use a fresh `Auth-Token` on the gateway MCP URL |
 | `NOT_AUTHORIZED` | Stop. Do not try another tenant |
 | `INVALID_INPUT` | Ask only for the missing business fields |
 | `UNKNOWN_SERVICE` / `UNKNOWN_OPERATION` | Call `list_services` or `describe_operation` |
@@ -195,12 +294,11 @@ Show `message` and `suggestedNextStep`. Do not retry when `retryable` is false. 
 
 ### Architecture
 
-```
-Assistant -- Auth-Token --> API gateway -- x-user-info + Auth-Token --> MCP server
-MCP server -- RequestInfo.authToken --> API gateway (RBAC) --> UPYOG service
-```
+See [Request flow](#request-flow) for the full two-hop diagram, tool pipeline, and walkthrough.
 
-Register an access-control action for `POST /upyog-mcp-server/mcp` (or `/upyog-mcp-server/**`) for roles that may use the chatbot.
+Gateway route (in `core-services/gateway/src/main/resources/routes.properties`): **`/upyog-mcp-server/**`** → `upyog-mcp-server:8088` with `StripPrefix=1`.
+
+Register an access-control action for **`/upyog-mcp-server/mcp`** (or `/upyog-mcp-server/**`) for roles that may use the chatbot (for example `CITIZEN`).
 
 Descriptors in `src/main/resources/descriptors/` choose the gateway path, method, and body. Templates accept only `$payload`, `$constant`, `$page`, and `$user` (`uuid`).
 
