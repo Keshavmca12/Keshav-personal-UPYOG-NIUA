@@ -13,11 +13,14 @@ Evaluation prompts in English and Hindi are in `docs/chatbot-team-guide.md`.
 | Item | Value |
 |---|---|
 | Transport | Streamable HTTP |
-| Endpoint | `POST /mcp` (default port `8088`) |
-| Session header | `auth-token: <existing UPYOG access token>` |
+| Production endpoint | `POST {gateway}/upyog-mcp-server/mcp` |
+| Local direct endpoint | `POST http://localhost:8088/mcp` (set `UPYOG_MCP_TRUST_GATEWAY_IDENTITY=false`) |
+| Session header | `Auth-Token: <UPYOG access token>` through the gateway; `auth-token` for direct MCP |
 | Correlation header | `x-correlation-id: <optional uuid>` |
 
-Do not put the token, user UUID, roles, or `RequestInfo` in tool arguments. The server builds `RequestInfo` and the gateway replaces `userInfo` from `POST /user/_details?access_token=`.
+Call MCP **through the API gateway** in deployed environments. The gateway validates the token, runs access-control on `/upyog-mcp-server/mcp`, and forwards `x-user-info` plus `Auth-Token` to MCP. MCP then calls business APIs through the same gateway with server-built `RequestInfo`.
+
+Do not put the token, user UUID, roles, or `RequestInfo` in tool arguments.
 
 If you omit `x-correlation-id`, the server creates one and returns it on the HTTP response and inside every tool result. Pass that id to support when a call fails.
 
@@ -27,16 +30,16 @@ If you omit `x-correlation-id`, the server creates one and returns it on the HTT
 {
   "mcpServers": {
     "upyog": {
-      "url": "http://localhost:8088/mcp",
+      "url": "http://localhost:8080/upyog-mcp-server/mcp",
       "headers": {
-        "auth-token": "<upyog-access-token>"
+        "Auth-Token": "<upyog-access-token>"
       }
     }
   }
 }
 ```
 
-Use the environment base URL in place of `localhost` when the server is deployed. The token is the same access token the UPYOG UI already holds after login. This server does not send OTP or create a session.
+Use the environment gateway base URL. For local MCP-only debugging without the gateway, use `http://localhost:8088/mcp`, `auth-token`, and `UPYOG_MCP_TRUST_GATEWAY_IDENTITY=false`.
 
 ## Tools
 
@@ -193,8 +196,11 @@ Show `message` and `suggestedNextStep`. Do not retry when `retryable` is false. 
 ### Architecture
 
 ```
-Assistant -- auth-token --> MCP server -- RequestInfo.authToken --> API gateway --> UPYOG service
+Assistant -- Auth-Token --> API gateway -- x-user-info + Auth-Token --> MCP server
+MCP server -- RequestInfo.authToken --> API gateway (RBAC) --> UPYOG service
 ```
+
+Register an access-control action for `POST /upyog-mcp-server/mcp` (or `/upyog-mcp-server/**`) for roles that may use the chatbot.
 
 Descriptors in `src/main/resources/descriptors/` choose the gateway path, method, and body. Templates accept only `$payload`, `$constant`, `$page`, and `$user` (`uuid`).
 
@@ -202,7 +208,8 @@ Descriptors in `src/main/resources/descriptors/` choose the gateway path, method
 
 | Variable | Purpose |
 |---|---|
-| `UPYOG_GATEWAY_BASE_URL` | API gateway, default `http://localhost:8080` |
+| `UPYOG_GATEWAY_BASE_URL` | API gateway for downstream business calls, default `http://localhost:8080` |
+| `UPYOG_MCP_TRUST_GATEWAY_IDENTITY` | `true` when chatbot reaches MCP via gateway (default). `false` for direct `:8088/mcp` dev |
 | `UPYOG_UI_BASE_URL` | Host prefixed on payment links |
 | `UPYOG_MCP_TOKEN_SECRET` | HMAC secret, at least 32 characters. Startup fails without it |
 | `REDIS_ENABLED` | `true` required before `confirm_action` works |

@@ -25,6 +25,11 @@ public class McpProperties {
     private int maxFreeTextChars = 1_000;
     private int maxUploadBytes = 2_000_000;
     private int rateLimitPerMinute = 60;
+    /**
+     * When true, MCP trusts {@code x-pass-through-gateway} and {@code x-user-info} from the API gateway
+     * and does not call {@code /user/_details} on the inbound MCP hop.
+     */
+    private boolean trustGatewayIdentity = true;
     private Redis redis = new Redis();
     private List<String> allowedGatewayPrefixes = new ArrayList<>();
 
@@ -122,6 +127,14 @@ public class McpProperties {
 
     public void setRateLimitPerMinute(int rateLimitPerMinute) {
         this.rateLimitPerMinute = rateLimitPerMinute;
+    }
+
+    public boolean isTrustGatewayIdentity() {
+        return trustGatewayIdentity;
+    }
+
+    public void setTrustGatewayIdentity(boolean trustGatewayIdentity) {
+        this.trustGatewayIdentity = trustGatewayIdentity;
     }
 
     public Redis getRedis() {

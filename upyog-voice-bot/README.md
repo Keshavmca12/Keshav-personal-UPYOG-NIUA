@@ -1116,17 +1116,17 @@ In `config.yml`:
 upyog:
   mcp:
     enabled: true
-    url: "http://localhost:8088/mcp"
+    url: "http://localhost:8080/upyog-mcp-server/mcp"
 ```
 
 Environment variables override the file:
 
 | Variable | Meaning |
 |---|---|
-| `UPYOG_MCP_URL` | Streamable HTTP endpoint, default `http://localhost:8088/mcp` |
+| `UPYOG_MCP_URL` | Streamable HTTP endpoint via gateway, default `{UPYOG_GATEWAY_BASE_URL}/upyog-mcp-server/mcp` |
 | `UPYOG_MCP_ENABLED` | `false` keeps the old direct gateway calls |
 
-The header on every MCP call is `auth-token` with the citizen session token from login. Writes on the MCP server need Redis. Without it, confirm returns `CONFIRMATION_STORE_UNAVAILABLE` and the bot tells the citizen the request was not submitted.
+The header on every MCP call is `Auth-Token` (gateway) with the citizen session token from login. Writes on the MCP server need Redis. Without it, confirm returns `CONFIRMATION_STORE_UNAVAILABLE` and the bot tells the citizen the request was not submitted.
 
 ### Run both
 
@@ -1138,7 +1138,7 @@ export REDIS_ENABLED=true
 mvn spring-boot:run
 
 # upyog-voice-bot
-export UPYOG_MCP_URL=http://localhost:8088/mcp
+export UPYOG_MCP_URL=http://localhost:8080/upyog-mcp-server/mcp
 python app.py
 ```
 

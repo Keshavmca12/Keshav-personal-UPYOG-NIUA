@@ -8,11 +8,19 @@ The MCP server is not the assistant. It does not choose a model, store chat memo
 
 ## 1. How to call the server
 
-Transport to be implemented: **Streamable HTTP** (production). STDIO is a developer profile only.
+Transport: **Streamable HTTP** through the **UPYOG API gateway** (production).
 
-Session header, confirmed:
+Production MCP URL:
 
-- `auth-token: <egov access token>`
+- `POST {gateway-base-url}/upyog-mcp-server/mcp`
+
+Session header on the **gateway** request (same as the UI):
+
+- `Auth-Token: <egov access token>`
+
+Local direct MCP (developers only, gateway bypass):
+
+- `POST http://localhost:8088/mcp` with `auth-token` and `UPYOG_MCP_TRUST_GATEWAY_IDENTITY=false` on the MCP pod.
 
 Do not put the token, user UUID, roles, or `RequestInfo` in tool arguments. The server builds `RequestInfo` and the gateway replaces `userInfo` from `POST /user/_details?access_token=`.
 
@@ -165,10 +173,10 @@ Columns:
 
 ### 6.1 JSON request and response for every case
 
-All MCP calls use Streamable HTTP on `POST /mcp` with headers:
+All MCP calls use Streamable HTTP on `POST {gateway}/upyog-mcp-server/mcp` with headers:
 
 ```http
-auth-token: <upyog-access-token>
+Auth-Token: <upyog-access-token>
 x-correlation-id: <optional-uuid>
 ```
 

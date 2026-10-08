@@ -33,7 +33,12 @@ class UpyogMcpClient:
     """Small Streamable HTTP client for the Java UPYOG MCP server."""
 
     def __init__(self, url: Optional[str] = None):
-        self.url = (url or os.environ.get("UPYOG_MCP_URL") or "http://localhost:8088/mcp").rstrip("/")
+        # Production: chatbot → API gateway → MCP (/upyog-mcp-server/mcp). Override with UPYOG_MCP_URL.
+        self.url = (
+            url
+            or os.environ.get("UPYOG_MCP_URL")
+            or os.environ.get("UPYOG_GATEWAY_BASE_URL", "http://localhost:8080").rstrip("/") + "/upyog-mcp-server/mcp"
+        ).rstrip("/")
 
     def call_tool(self, name: str, arguments: Dict[str, Any], auth_token: str) -> Dict[str, Any]:
         """Open a short MCP session and call one tool with the citizen token."""
@@ -89,7 +94,8 @@ class UpyogMcpClient:
         headers = {
             "Content-Type": "application/json",
             "Accept": "application/json, text/event-stream",
-            # Citizen session token. The MCP server builds RequestInfo from this. Do not log it.
+            # Gateway validates Auth-Token on /upyog-mcp-server/mcp; MCP forwards it on downstream calls.
+            "Auth-Token": auth_token,
             "auth-token": auth_token,
             "x-correlation-id": str(uuid.uuid4()),
         }

@@ -67,6 +67,7 @@ upyog:
     max-free-text-chars: 1000
     max-upload-bytes: 2000000
     rate-limit-per-minute: 60
+    trust-gateway-identity: ${UPYOG_MCP_TRUST_GATEWAY_IDENTITY:true}
     redis:
       enabled: ${REDIS_ENABLED:false}
       uri: ${REDIS_URI:redis://localhost:6379}

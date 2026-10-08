@@ -44,6 +44,8 @@ spec:
                 secretKeyRef:
                   name: upyog-mcp-server
                   key: redis-uri
+            - name: UPYOG_MCP_TRUST_GATEWAY_IDENTITY
+              value: "true"
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
@@ -90,6 +92,7 @@ data:
   gateway-base-url: http://gateway.egov:8080
   ui-base-url: https://upyog.niua.org
   redis-enabled: "true"
+  trust-gateway-identity: "true"
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
