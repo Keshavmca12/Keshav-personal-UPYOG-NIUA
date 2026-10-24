@@ -51,6 +51,16 @@ public class Consent {
     private Long expiryTime;
     @JsonProperty("noticeRef")
     private String noticeRef;
+    @JsonProperty("guardianUuid")
+    private String guardianUuid;
+    @JsonProperty("isChildData")
+    private Boolean isChildData;
+    @JsonProperty("consentManagerId")
+    private String consentManagerId;
+    @JsonProperty("noticeVersion")
+    private String noticeVersion;
+    @JsonProperty("channel")
+    private String channel;
     @JsonProperty("purposes")
     private List<String> purposes;
     @JsonProperty("createdBy")

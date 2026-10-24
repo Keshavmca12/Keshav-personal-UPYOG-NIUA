@@ -34,4 +34,10 @@ public class RightsController {
     public ResponseEntity<RightsResponse> search(@Valid @RequestBody RightsRequest request) {
         return ResponseEntity.ok(rightsService.search(request));
     }
+
+    @PostMapping("/_update")
+    @Operation(summary = "Update and fulfil a rights request")
+    public ResponseEntity<RightsResponse> update(@Valid @RequestBody RightsRequest request) {
+        return ResponseEntity.ok(rightsService.update(request));
+    }
 }

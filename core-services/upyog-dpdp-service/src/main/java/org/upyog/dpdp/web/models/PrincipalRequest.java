@@ -42,6 +42,10 @@ public class PrincipalRequest {
     private String correctionField;
     @JsonProperty("correctionValue")
     private String correctionValue;
+    @JsonProperty("slaDueAt")
+    private Long slaDueAt;
+    @JsonProperty("workflowState")
+    private String workflowState;
     @JsonProperty("createdBy")
     private String createdBy;
     @JsonProperty("lastModifiedBy")

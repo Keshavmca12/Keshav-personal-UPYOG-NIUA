@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ include file="/includes/taglibs.jsp"%>
 <%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 
 <form:form role="form" action="create" modelAttribute="budgetForm" id="budgetItemFunction"
 	cssClass="form-horizontal form-groups-bordered" enctype="multipart/form-data">
@@ -222,11 +222,19 @@
 
 
 
+<style>
+  span.twitter-typeahead .tt-dropdown-menu {
+    max-height: 250px;
+    overflow-y: auto;
+    width: 100%;
+  }
+</style>
+
 <!-- JS -->
 <script
 	src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>">
 </script>
-<script src="<cdn:url value='/resources/app/js/budget/budgetItemFormHelper.js' context='/services/EGF'/>"></script>
+<script src="<cdn:url value='/resources/app/js/budget/budgetItemFormHelper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 <script src="<cdn:url value='/resources/app/js/common/helper.js?rnd=${app_release_no}' context='/services/EGF'/>">
 </script>
 <!-- <script>

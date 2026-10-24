@@ -89,11 +89,35 @@ public class DpdpConfiguration {
     @Value("${egov.user.search.endpoint}")
     private String userSearchEndpoint;
 
+    @Value("${egov.user.update.endpoint:/user/users/_updatenovalidate}")
+    private String userUpdateEndpoint;
+
+    @Value("${egov.property.host:http://localhost:8082}")
+    private String propertyHost;
+
+    @Value("${egov.property.search.endpoint:/property-services/property/_search}")
+    private String propertySearchEndpoint;
+
     @Value("${retention.default.action}")
     private String defaultRetentionAction;
 
     @Value("${scheduler.retention.enabled}")
     private boolean retentionSchedulerEnabled;
+
+    @Value("${dpdp.scan.allow-adhoc-jdbc:false}")
+    private boolean allowAdhocJdbc;
+
+    @Value("${dpdp.scan.allowed-jdbc-hosts:localhost,postgres.egov}")
+    private String allowedJdbcHosts;
+
+    @Value("${dpdp.workflow.enabled:false}")
+    private boolean workflowEnabled;
+
+    @Value("${dpdp.workflow.business-service:DPDP_RIGHTS}")
+    private String workflowBusinessService;
+
+    @Value("${egov.workflow.host:http://localhost:8280}")
+    private String workflowHost;
 
     @PostConstruct
     public void initialize() {

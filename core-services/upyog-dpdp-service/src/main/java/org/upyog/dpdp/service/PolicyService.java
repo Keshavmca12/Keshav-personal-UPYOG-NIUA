@@ -1,64 +1,50 @@
 package org.upyog.dpdp.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.upyog.dpdp.util.DpdpConstants;
 import org.upyog.dpdp.web.models.DataFieldPolicy;
 import org.upyog.dpdp.web.models.PurposeDefinition;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Slf4j
 public class PolicyService {
 
-    private final List<PurposeDefinition> purposes;
+    private final MdmsPolicyClient mdmsPolicyClient;
+    private final Map<String, List<PurposeDefinition>> purposeCache = new ConcurrentHashMap<>();
 
-    public PolicyService(ObjectMapper objectMapper) {
-        List<PurposeDefinition> loaded = new ArrayList<>();
-        try (InputStream in = new ClassPathResource("mdms/DPDP/Purpose.json").getInputStream()) {
-            loaded = objectMapper.readValue(in, new TypeReference<List<PurposeDefinition>>() {
-            });
-        } catch (Exception ex) {
-            log.warn("Could not load classpath DPDP Purpose.json: {}", ex.getMessage());
-            loaded.add(PurposeDefinition.builder()
-                    .code("PROPERTY_TAX_SERVICE")
-                    .processingBasis(DpdpConstants.BASIS_STATUTORY_FUNCTION)
-                    .applicationCode("PT")
-                    .build());
-            loaded.add(PurposeDefinition.builder()
-                    .code("OPTIONAL_ALERTS")
-                    .processingBasis(DpdpConstants.BASIS_CONSENT)
-                    .applicationCode("PGR")
-                    .build());
-        }
-        this.purposes = loaded;
+    public PolicyService(MdmsPolicyClient mdmsPolicyClient) {
+        this.mdmsPolicyClient = mdmsPolicyClient;
     }
 
     public List<PurposeDefinition> getPurposes(String tenantId) {
-        return purposes;
+        String key = StringUtils.defaultIfBlank(tenantId, "default");
+        return purposeCache.computeIfAbsent(key, mdmsPolicyClient::getPurposes);
     }
 
-    public PurposeDefinition findPurpose(String purposeCode) {
+    public PurposeDefinition findPurpose(String tenantId, String purposeCode) {
         if (StringUtils.isBlank(purposeCode)) {
             return null;
         }
-        return purposes.stream()
+        return getPurposes(tenantId).stream()
                 .filter(p -> purposeCode.equals(p.getCode()))
                 .findFirst()
                 .orElse(null);
     }
 
+    public PurposeDefinition findPurpose(String purposeCode) {
+        return findPurpose(null, purposeCode);
+    }
+
     public String resolveProcessingBasis(String tenantId, String purposeCode, String requested) {
-        PurposeDefinition purpose = findPurpose(purposeCode);
+        PurposeDefinition purpose = findPurpose(tenantId, purposeCode);
         if (purpose != null && StringUtils.isNotBlank(purpose.getProcessingBasis())) {
             return purpose.getProcessingBasis();
         }
@@ -70,7 +56,7 @@ public class PolicyService {
     }
 
     public Map<String, Object> evaluateMinimization(String tenantId, String purposeCode, List<String> collectedFields) {
-        PurposeDefinition purpose = findPurpose(purposeCode);
+        PurposeDefinition purpose = findPurpose(tenantId, purposeCode);
         List<String> extra = new ArrayList<>();
         List<String> justified = new ArrayList<>();
         if (purpose != null && purpose.getDataFields() != null && collectedFields != null) {
@@ -92,5 +78,9 @@ public class PolicyService {
         result.put("unjustifiedFields", extra);
         result.put("finding", extra.isEmpty() ? null : "JUSTIFICATION_REQUIRED");
         return result;
+    }
+
+    public void evictCache(String tenantId) {
+        purposeCache.remove(StringUtils.defaultIfBlank(tenantId, "default"));
     }
 }

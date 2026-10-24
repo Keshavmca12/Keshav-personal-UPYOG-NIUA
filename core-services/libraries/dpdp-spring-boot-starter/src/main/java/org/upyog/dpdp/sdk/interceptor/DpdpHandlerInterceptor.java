@@ -9,6 +9,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.upyog.dpdp.sdk.annotation.Purpose;
 import org.upyog.dpdp.sdk.annotation.RequiresConsent;
 import org.upyog.dpdp.sdk.client.DpdpCoreClient;
+import org.upyog.dpdp.sdk.context.DpdpRequestContext;
 
 import java.util.Map;
 
@@ -22,16 +23,16 @@ public class DpdpHandlerInterceptor implements HandlerInterceptor {
     private final boolean enforceConsent;
     private final boolean enforcePurpose;
     private final FailMode failMode;
-    private final String tenantId;
+    private final String defaultTenantId;
     private final DpdpCoreClient client;
 
     public DpdpHandlerInterceptor(boolean enabled, boolean enforceConsent, boolean enforcePurpose,
-                                  FailMode failMode, String tenantId, DpdpCoreClient client) {
+                                  FailMode failMode, String defaultTenantId, DpdpCoreClient client) {
         this.enabled = enabled;
         this.enforceConsent = enforceConsent;
         this.enforcePurpose = enforcePurpose;
         this.failMode = failMode;
-        this.tenantId = tenantId;
+        this.defaultTenantId = defaultTenantId;
         this.client = client;
     }
 
@@ -53,9 +54,9 @@ public class DpdpHandlerInterceptor implements HandlerInterceptor {
         if (!enforceConsent || purpose == null || purpose.isBlank()) {
             return true;
         }
+        DpdpRequestContext context = DpdpRequestContext.from(request, defaultTenantId);
         try {
-            Map<String, Object> verification = client.verifyConsent(
-                    Map.of("apiId", "dpdp-sdk"), tenantId, purpose, request.getHeader("x-user-uuid"));
+            Map<String, Object> verification = client.verifyConsentInterService(context, purpose);
             boolean allowed = Boolean.TRUE.equals(verification.get("allowed"));
             boolean required = Boolean.TRUE.equals(verification.get("required"));
             if (required && !allowed) {

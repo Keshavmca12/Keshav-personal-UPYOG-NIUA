@@ -2,9 +2,13 @@ package org.upyog.dpdp.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
 import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class RequestValidator {
@@ -21,16 +25,34 @@ public class RequestValidator {
         if (StringUtils.isBlank(tenantId)) {
             throw new CustomException(DpdpConstants.ERR_TENANT_REQUIRED, "tenantId is required");
         }
-        if (user.getTenantId() == null) {
+        if (user == null || user.getTenantId() == null) {
             return;
         }
-        boolean allowed = tenantId.equals(user.getTenantId())
-                || tenantId.startsWith(user.getTenantId() + ".")
-                || user.getTenantId().startsWith(tenantId + ".")
-                || tenantId.startsWith(user.getTenantId().split("\\.")[0]);
-        if (!allowed && !isEmployee(user)) {
+        if (tenantId.equals(user.getTenantId())) {
+            return;
+        }
+        if (isEmployee(user) && employeeTenants(user).contains(tenantId)) {
+            return;
+        }
+        if (!isEmployee(user)) {
             throw new CustomException(DpdpConstants.ERR_CROSS_TENANT, "Cross-tenant access is not allowed");
         }
+        throw new CustomException(DpdpConstants.ERR_CROSS_TENANT, "Cross-tenant access is not allowed");
+    }
+
+    private Set<String> employeeTenants(User user) {
+        Set<String> tenants = new HashSet<>();
+        if (StringUtils.isNotBlank(user.getTenantId())) {
+            tenants.add(user.getTenantId());
+        }
+        if (user.getRoles() != null) {
+            for (Role role : user.getRoles()) {
+                if (role != null && StringUtils.isNotBlank(role.getTenantId())) {
+                    tenants.add(role.getTenantId());
+                }
+            }
+        }
+        return tenants;
     }
 
     public String resolvePrincipal(User user, String requestedUuid) {

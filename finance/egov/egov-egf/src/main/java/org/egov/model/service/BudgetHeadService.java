@@ -1,7 +1,7 @@
 package org.egov.model.service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import org.apache.struts2.util.SortIteratorFilter;
 import org.egov.commons.CFinancialYear;
@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
+import static org.egov.utils.BudgetConstants.*;
 
 /**
  * Service class responsible for managing {@link BudgetHead} entities and
@@ -91,16 +93,16 @@ public class BudgetHeadService {
         if (budgetHead.getAccountType() != null) {
             switch (budgetHead.getAccountType()) {
                 case REVENUE_RECEIPTS:
-                    budgetHead.setAccountTypeCode("RR");
+                    budgetHead.setAccountTypeCode(ACCOUNT_TYPE_CODE_RR);
                     break;
                 case REVENUE_EXPENDITURE:
-                    budgetHead.setAccountTypeCode("RE");
+                    budgetHead.setAccountTypeCode(ACCOUNT_TYPE_CODE_RE);
                     break;
                 case CAPITAL_RECEIPTS:
-                    budgetHead.setAccountTypeCode("CR");
+                    budgetHead.setAccountTypeCode(ACCOUNT_TYPE_CODE_CR);
                     break;
                 case CAPITAL_EXPENDITURE:
-                    budgetHead.setAccountTypeCode("CE");
+                    budgetHead.setAccountTypeCode(ACCOUNT_TYPE_CODE_CE);
                     break;
                 default:
                     budgetHead.setAccountTypeCode(null); // or throw exception
@@ -146,19 +148,43 @@ public class BudgetHeadService {
     }
 
     public List<BudgetHead> getActiveBudgetHeads() {
-        List<BudgetHead> budgetHeads = budgetHeadRepository.findAll(new Sort(Sort.Direction.ASC, "order"));
+        List<BudgetHead> budgetHeads = budgetHeadRepository.findAll(Sort.by(Sort.Direction.ASC, "order"));
         return budgetHeads;
     }
 
 
     public List<BudgetHead> findBudgetHeadByNameOrCode(final String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return budgetHeadRepository.findAll();
+        }
+        String trimmedQuery = query.trim().toUpperCase();
+        if (isAccountTypeCodeOrPrefix(trimmedQuery)) {
+            return budgetHeadRepository.findByAccountTypeCodeIgnoreCaseOrCodeStartingWithIgnoreCase(trimmedQuery, trimmedQuery);
+        }
         return budgetHeadRepository.findByCodeContainingIgnoreCaseOrNameContainingIgnoreCase(query, query);
     }
 
 
 
     public List<BudgetHead> searchBudgetHeadsByFunctionNative(final Long functionId, final String query) {
-        return budgetHeadRepository.searchBudgetHeadsByFunctionNative(functionId, query);
+        if (query == null || query.trim().isEmpty()) {
+            return budgetHeadRepository.getBudgetHeadByFunction(functionId);
+        }
+        String trimmedQuery = query.trim().toUpperCase();
+        if (isAccountTypeCodeOrPrefix(trimmedQuery)) {
+            return budgetHeadRepository.searchBudgetHeadsByAccountTypeOrCodePrefix(functionId, trimmedQuery);
+        }
+        return budgetHeadRepository.searchBudgetHeadsByFunctionNative(functionId, query.trim());
+    }
+
+    private boolean isAccountTypeCodeOrPrefix(final String query) {
+        if (query == null || query.isEmpty()) {
+            return false;
+        }
+        return query.equals(ACCOUNT_TYPE_CODE_RR) || query.equals(ACCOUNT_TYPE_CODE_RE)
+                || query.equals(ACCOUNT_TYPE_CODE_CR) || query.equals(ACCOUNT_TYPE_CODE_CE)
+                || query.startsWith(PREFIX_RR) || query.startsWith(PREFIX_RE)
+                || query.startsWith(PREFIX_CR) || query.startsWith(PREFIX_CE);
     }
 
     public List<BudgetHead> getBudgetHeadsByFunction(CFunction function) {
@@ -166,7 +192,7 @@ public class BudgetHeadService {
     }
 
     public BudgetHead findById(final  Long budgetHeadId) {
-        return budgetHeadRepository.findOne(budgetHeadId);
+        return budgetHeadRepository.findById(budgetHeadId).orElse(null);
     }
 
 

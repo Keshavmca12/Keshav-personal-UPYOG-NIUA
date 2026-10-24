@@ -82,6 +82,19 @@ public class ScanRepository {
             .incidentType(rs.getString("incident_type"))
             .status(rs.getString("status"))
             .severity(rs.getString("severity"))
+            .discoveryTime(rs.getObject("discovery_time") == null ? null : rs.getLong("discovery_time"))
+            .awarenessTime(rs.getObject("awareness_time") == null ? null : rs.getLong("awareness_time"))
+            .boardInitialAt(rs.getObject("board_initial_at") == null ? null : rs.getLong("board_initial_at"))
+            .boardReportDueAt(rs.getObject("board_report_due_at") == null ? null : rs.getLong("board_report_due_at"))
+            .certInFlaggedAt(rs.getObject("cert_in_flagged_at") == null ? null : rs.getLong("cert_in_flagged_at"))
+            .certInRequired(rs.getObject("cert_in_required") == null ? null : rs.getBoolean("cert_in_required"))
+            .cause(rs.getString("cause"))
+            .remediation(rs.getString("remediation"))
+            .affectedPrincipalsCount(rs.getObject("affected_principals_count") == null ? null
+                    : rs.getInt("affected_principals_count"))
+            .affectedRecords(rs.getObject("affected_records") == null ? null : rs.getInt("affected_records"))
+            .containmentAction(rs.getString("containment_action"))
+            .notificationStatus(rs.getString("notification_status"))
             .description(rs.getString("description"))
             .createdBy(rs.getString("createdby"))
             .createdTime(rs.getLong("createdtime"))
@@ -200,19 +213,29 @@ public class ScanRepository {
 
     public void insertIncident(PrivacyIncident incident) {
         jdbcTemplate.update(
-                "INSERT INTO ug_dpdp_privacy_incident(id, incident_number, tenant_id, application_code, data_category, incident_type, status, severity, discovery_time, affected_records, containment_action, notification_status, description, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "INSERT INTO ug_dpdp_privacy_incident(id, incident_number, tenant_id, application_code, data_category, incident_type, status, severity, discovery_time, awareness_time, board_initial_at, board_report_due_at, cert_in_flagged_at, cert_in_required, cause, remediation, affected_principals_count, affected_records, containment_action, notification_status, description, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 incident.getId(), incident.getIncidentNumber(), incident.getTenantId(), incident.getApplicationCode(),
                 incident.getDataCategory(), incident.getIncidentType(), incident.getStatus(), incident.getSeverity(),
-                incident.getDiscoveryTime(), incident.getAffectedRecords(), incident.getContainmentAction(),
-                incident.getNotificationStatus(), incident.getDescription(), incident.getCreatedBy(),
-                incident.getCreatedBy(), incident.getCreatedTime(), incident.getLastModifiedTime());
+                incident.getDiscoveryTime(), incident.getAwarenessTime(), incident.getBoardInitialAt(),
+                incident.getBoardReportDueAt(), incident.getCertInFlaggedAt(), incident.getCertInRequired(),
+                incident.getCause(), incident.getRemediation(), incident.getAffectedPrincipalsCount(),
+                incident.getAffectedRecords(), incident.getContainmentAction(), incident.getNotificationStatus(),
+                incident.getDescription(), incident.getCreatedBy(), incident.getCreatedBy(), incident.getCreatedTime(),
+                incident.getLastModifiedTime());
     }
 
     public void updateIncident(PrivacyIncident incident) {
         jdbcTemplate.update(
-                "UPDATE ug_dpdp_privacy_incident SET status=?, containment_action=?, notification_status=?, lastmodifiedtime=? WHERE id=? AND tenant_id=?",
+                "UPDATE ug_dpdp_privacy_incident SET status=?, containment_action=?, notification_status=?, board_initial_at=?, cert_in_flagged_at=?, lastmodifiedtime=? WHERE id=? AND tenant_id=?",
                 incident.getStatus(), incident.getContainmentAction(), incident.getNotificationStatus(),
-                incident.getLastModifiedTime(), incident.getId(), incident.getTenantId());
+                incident.getBoardInitialAt(), incident.getCertInFlaggedAt(), incident.getLastModifiedTime(),
+                incident.getId(), incident.getTenantId());
+    }
+
+    public List<PrivacyIncident> findIncidentsWithPendingBoardNotification(long now) {
+        return jdbcTemplate.query(
+                "SELECT * FROM ug_dpdp_privacy_incident WHERE board_report_due_at IS NOT NULL AND board_report_due_at <= ? AND (notification_status IS NULL OR notification_status <> ?)",
+                INCIDENT_MAPPER, now, org.upyog.dpdp.util.DpdpConstants.INCIDENT_BOARD_NOTIFIED);
     }
 
     public List<PrivacyIncident> searchIncidents(String tenantId) {

@@ -47,4 +47,10 @@ public class ConsentController {
     public ResponseEntity<ConsentResponse> verify(@Valid @RequestBody ConsentSearchRequest request) {
         return ResponseEntity.ok(consentService.verify(request));
     }
+
+    @PostMapping("/_verifyInterService")
+    @Operation(summary = "Inter-service consent verification using authToken and principal uuid")
+    public ResponseEntity<ConsentResponse> verifyInterService(@Valid @RequestBody ConsentSearchRequest request) {
+        return ResponseEntity.ok(consentService.verifyInterService(request));
+    }
 }

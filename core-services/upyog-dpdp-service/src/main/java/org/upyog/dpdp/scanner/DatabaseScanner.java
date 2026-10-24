@@ -1,6 +1,8 @@
 package org.upyog.dpdp.scanner;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.upyog.dpdp.config.DpdpConfiguration;
 import org.upyog.dpdp.engine.ClassificationEngine;
 import org.upyog.dpdp.engine.RuleEngine;
 import org.upyog.dpdp.util.PiiMasker;
@@ -23,15 +25,33 @@ public class DatabaseScanner {
 
     private final ClassificationEngine classificationEngine;
     private final RuleEngine ruleEngine;
+    private final DpdpConfiguration configuration;
 
-    public DatabaseScanner(ClassificationEngine classificationEngine, RuleEngine ruleEngine) {
+    public DatabaseScanner(ClassificationEngine classificationEngine, RuleEngine ruleEngine,
+                           DpdpConfiguration configuration) {
         this.classificationEngine = classificationEngine;
         this.ruleEngine = ruleEngine;
+        this.configuration = configuration;
     }
 
     public List<Finding> scan(ScanJob job, List<ComplianceRule> rules) {
         List<Finding> findings = new ArrayList<>();
         if (job.getJdbcUrl() == null) {
+            return findings;
+        }
+        if (!jdbcHostAllowed(job.getJdbcUrl())) {
+            findings.add(Finding.builder()
+                    .id(java.util.UUID.randomUUID().toString())
+                    .tenantId(job.getTenantId())
+                    .scanId(job.getId())
+                    .ruleCode("DPDP-DB-UNREGISTERED")
+                    .category("SECURITY")
+                    .severity("HIGH")
+                    .status("OPEN")
+                    .title("Unregistered JDBC data source")
+                    .description("Ad-hoc JDBC URLs are disabled; register the source in MDMS DataSecurity")
+                    .createdTime(System.currentTimeMillis())
+                    .build());
             return findings;
         }
         try (Connection connection = DriverManager.getConnection(job.getJdbcUrl(), job.getJdbcUser(), job.getJdbcPassword())) {
@@ -72,5 +92,21 @@ public class DatabaseScanner {
                     .build());
         }
         return findings;
+    }
+
+    private boolean jdbcHostAllowed(String jdbcUrl) {
+        if (configuration.isAllowAdhocJdbc()) {
+            return true;
+        }
+        String host = jdbcUrl.replaceFirst("jdbc:[^:/]+://([^:/]+).*", "$1");
+        if (StringUtils.isBlank(host) || host.equals(jdbcUrl)) {
+            return false;
+        }
+        for (String allowed : configuration.getAllowedJdbcHosts().split(",")) {
+            if (host.equalsIgnoreCase(allowed.trim())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

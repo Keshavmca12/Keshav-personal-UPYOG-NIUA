@@ -33,6 +33,22 @@ public class PrivacyIncident {
     private String severity;
     @JsonProperty("discoveryTime")
     private Long discoveryTime;
+    @JsonProperty("awarenessTime")
+    private Long awarenessTime;
+    @JsonProperty("boardInitialAt")
+    private Long boardInitialAt;
+    @JsonProperty("boardReportDueAt")
+    private Long boardReportDueAt;
+    @JsonProperty("certInFlaggedAt")
+    private Long certInFlaggedAt;
+    @JsonProperty("certInRequired")
+    private Boolean certInRequired;
+    @JsonProperty("cause")
+    private String cause;
+    @JsonProperty("remediation")
+    private String remediation;
+    @JsonProperty("affectedPrincipalsCount")
+    private Integer affectedPrincipalsCount;
     @JsonProperty("affectedRecords")
     private Integer affectedRecords;
     @JsonProperty("containmentAction")

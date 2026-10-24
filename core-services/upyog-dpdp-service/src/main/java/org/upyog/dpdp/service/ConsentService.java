@@ -1,6 +1,8 @@
 package org.upyog.dpdp.service;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import org.apache.commons.lang3.StringUtils;
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Service;
@@ -122,16 +124,43 @@ public class ConsentService {
     }
 
     public ConsentResponse verify(ConsentSearchRequest request) {
-        User user = requestValidator.requireUser(request.getRequestInfo());
         ConsentSearchCriteria criteria = request.getConsentSearchCriteria() == null
                 ? new ConsentSearchCriteria() : request.getConsentSearchCriteria();
+        RequestInfo requestInfo = request.getRequestInfo();
+        if (requestInfo != null && requestInfo.getUserInfo() == null
+                && StringUtils.isNotBlank(criteria.getDataPrincipalUuid())
+                && StringUtils.isNotBlank(requestInfo.getAuthToken())) {
+            return verifyInterService(request);
+        }
+        User user = requestValidator.requireUser(requestInfo);
         requestValidator.assertTenantAccess(user, criteria.getTenantId());
+        return buildVerificationResponse(request, criteria, requestValidator.resolvePrincipal(user,
+                criteria.getDataPrincipalUuid()));
+    }
+
+    public ConsentResponse verifyInterService(ConsentSearchRequest request) {
+        ConsentSearchCriteria criteria = request.getConsentSearchCriteria() == null
+                ? new ConsentSearchCriteria() : request.getConsentSearchCriteria();
+        if (request.getRequestInfo() == null || StringUtils.isBlank(request.getRequestInfo().getAuthToken())) {
+            throw new CustomException(DpdpConstants.ERR_VALIDATION, "authToken required for inter-service verify");
+        }
+        if (StringUtils.isBlank(criteria.getDataPrincipalUuid())) {
+            throw new CustomException(DpdpConstants.ERR_VALIDATION, "dataPrincipalUuid required for inter-service verify");
+        }
+        if (StringUtils.isBlank(criteria.getTenantId())) {
+            throw new CustomException(DpdpConstants.ERR_TENANT_REQUIRED, "tenantId is required");
+        }
+        return buildVerificationResponse(request, criteria, criteria.getDataPrincipalUuid());
+    }
+
+    private ConsentResponse buildVerificationResponse(ConsentSearchRequest request, ConsentSearchCriteria criteria,
+                                                      String principalUuid) {
         String basis = policyService.resolveProcessingBasis(criteria.getTenantId(), criteria.getPurposeCode(), null);
         boolean required = DpdpConstants.BASIS_CONSENT.equals(basis);
         boolean allowed = !required;
         String status = "NOT_REQUIRED";
         if (required) {
-            criteria.setDataPrincipalUuid(requestValidator.resolvePrincipal(user, criteria.getDataPrincipalUuid()));
+            criteria.setDataPrincipalUuid(principalUuid);
             criteria.setStatus(DpdpConstants.CONSENT_GRANTED);
             allowed = !repository.search(criteria).isEmpty();
             status = allowed ? DpdpConstants.CONSENT_GRANTED : "MISSING";

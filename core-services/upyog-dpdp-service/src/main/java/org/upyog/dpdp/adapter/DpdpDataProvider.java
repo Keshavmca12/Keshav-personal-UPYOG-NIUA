@@ -14,6 +14,10 @@ public interface DpdpDataProvider {
 
     DeletionResult deletePersonalData(DataPrincipalContext context);
 
+    default DeletionResult anonymisePersonalData(DataPrincipalContext context) {
+        return deletePersonalData(context);
+    }
+
     record DataPrincipalContext(String tenantId, String userUuid, String applicationCode) {
     }
 

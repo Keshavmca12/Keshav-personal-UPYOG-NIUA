@@ -4,27 +4,33 @@ import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.stereotype.Service;
+import org.upyog.dpdp.adapter.DpdpDataProvider;
 import org.upyog.dpdp.config.DpdpConfiguration;
+import org.upyog.dpdp.repository.ErasureJobRepository;
 import org.upyog.dpdp.repository.ScanRepository;
 import org.upyog.dpdp.util.DpdpConstants;
 import org.upyog.dpdp.web.models.ProcessingActivity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Slf4j
 public class RetentionService {
 
     private final ScanRepository scanRepository;
+    private final ErasureJobRepository erasureJobRepository;
+    private final List<DpdpDataProvider> providers;
     private final PrivacyEventService privacyEventService;
     private final DpdpConfiguration configuration;
     private final MeterRegistry meterRegistry;
 
-    public RetentionService(ScanRepository scanRepository, PrivacyEventService privacyEventService,
+    public RetentionService(ScanRepository scanRepository, ErasureJobRepository erasureJobRepository,
+                            List<DpdpDataProvider> providers, PrivacyEventService privacyEventService,
                             DpdpConfiguration configuration, MeterRegistry meterRegistry) {
         this.scanRepository = scanRepository;
+        this.erasureJobRepository = erasureJobRepository;
+        this.providers = providers;
         this.privacyEventService = privacyEventService;
         this.configuration = configuration;
         this.meterRegistry = meterRegistry;
@@ -33,7 +39,7 @@ public class RetentionService {
     public void registerActivity(String tenantId, String application, String purpose, String basis,
                                  String categories, String retentionCode, Long expiresAt, String actor) {
         scanRepository.insertActivity(ProcessingActivity.builder()
-                .id(UUID.randomUUID().toString())
+                .id(java.util.UUID.randomUUID().toString())
                 .tenantId(tenantId)
                 .applicationCode(application)
                 .purposeCode(purpose)
@@ -56,7 +62,9 @@ public class RetentionService {
                 log.info("Skipping retention for {} due to legal hold", activity.getId());
                 continue;
             }
-            String status = statusForAction(configuration.getDefaultRetentionAction());
+            String action = configuration.getDefaultRetentionAction();
+            runErasure(activity, action, requestInfo);
+            String status = statusForAction(action);
             scanRepository.updateActivityStatus(activity.getId(), activity.getTenantId(), status,
                     System.currentTimeMillis());
             activity.setStatus(status);
@@ -68,6 +76,27 @@ public class RetentionService {
             meterRegistry.counter("dpdp.deletion.completed").increment();
         }
         return processed;
+    }
+
+    private void runErasure(ProcessingActivity activity, String action, RequestInfo requestInfo) {
+        String jobId = erasureJobRepository.createJob(activity.getTenantId(), activity.getId(),
+                activity.getApplicationCode(), action, "system");
+        DpdpDataProvider.DataPrincipalContext context = new DpdpDataProvider.DataPrincipalContext(
+                activity.getTenantId(), null, activity.getApplicationCode());
+        for (DpdpDataProvider provider : providers) {
+            if (activity.getApplicationCode() != null
+                    && !provider.applicationCode().equals(activity.getApplicationCode())
+                    && !"GENERIC".equals(provider.applicationCode())) {
+                continue;
+            }
+            DpdpDataProvider.DeletionResult result = "ARCHIVE".equals(action)
+                    ? provider.anonymisePersonalData(context)
+                    : provider.deletePersonalData(context);
+            erasureJobRepository.addTask(jobId, activity.getTenantId(), provider.applicationCode(),
+                    result.deleted() ? DpdpConstants.STATUS_COMPLETED : DpdpConstants.STATUS_PENDING,
+                    result.message());
+        }
+        erasureJobRepository.completeJob(jobId, activity.getTenantId(), DpdpConstants.STATUS_COMPLETED, null);
     }
 
     static boolean isOnLegalHold(ProcessingActivity activity) {

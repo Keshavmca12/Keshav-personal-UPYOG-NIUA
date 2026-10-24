@@ -16,8 +16,10 @@ public final class DpdpConstants {
     public static final String RIGHTS_CORRECTION = "CORRECTION";
     public static final String RIGHTS_ERASURE = "ERASURE";
     public static final String RIGHTS_GRIEVANCE = "GRIEVANCE";
+    public static final String RIGHTS_NOMINATION = "NOMINATION";
 
     public static final String STATUS_OPEN = "OPEN";
+    public static final String STATUS_PENDING = "PENDING";
     public static final String STATUS_IN_PROGRESS = "IN_PROGRESS";
     public static final String STATUS_COMPLETED = "COMPLETED";
     public static final String STATUS_REJECTED = "REJECTED";
@@ -43,6 +45,20 @@ public final class DpdpConstants {
     public static final String SEVERITY_HIGH = "HIGH";
     public static final String SEVERITY_MEDIUM = "MEDIUM";
     public static final String SEVERITY_LOW = "LOW";
+
+    public static final String INCIDENT_BOARD_PENDING = "BOARD_NOTIFICATION_PENDING";
+    public static final String INCIDENT_BOARD_NOTIFIED = "BOARD_NOTIFIED";
+    public static final String INCIDENT_CERT_IN_PENDING = "CERT_IN_PENDING";
+    public static final String INCIDENT_CERT_IN_NOTIFIED = "CERT_IN_NOTIFIED";
+
+    public static final String WORKFLOW_RECEIVED = "RECEIVED";
+    public static final String WORKFLOW_IN_REVIEW = "IN_REVIEW";
+    public static final String WORKFLOW_FULFILLED = "FULFILLED";
+
+    public static final long SLA_ACCESS_DAYS = 30L;
+    public static final long SLA_CORRECTION_DAYS = 15L;
+    public static final long SLA_GRIEVANCE_DAYS = 90L;
+    public static final long BOARD_REPORT_HOURS = 72L;
 
     public static final String CLASS_PERSONAL = "PERSONAL";
     public static final String CLASS_HIGH_RISK = "HIGH_RISK_PERSONAL";
