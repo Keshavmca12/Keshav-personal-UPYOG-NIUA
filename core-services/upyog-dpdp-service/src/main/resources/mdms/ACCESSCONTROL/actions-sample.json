@@ -1,0 +1,26 @@
+{
+  "tenantId": "pg",
+  "moduleName": "ACCESSCONTROL-ACTIONS-TEST",
+  "actions-test": [
+    { "id": 91001, "name": "DPDP Consent Create", "url": "/upyog-dpdp-service/consent/v1/_create", "servicecode": "DPDP", "enabled": true },
+    { "id": 91002, "name": "DPDP Consent Search", "url": "/upyog-dpdp-service/consent/v1/_search", "servicecode": "DPDP", "enabled": true },
+    { "id": 91003, "name": "DPDP Consent Withdraw", "url": "/upyog-dpdp-service/consent/v1/_withdraw", "servicecode": "DPDP", "enabled": true },
+    { "id": 91004, "name": "DPDP Scan Create", "url": "/upyog-dpdp-service/scan/v1/_create", "servicecode": "DPDP", "enabled": true },
+    { "id": 91005, "name": "DPDP Compliance Summary", "url": "/upyog-dpdp-service/compliance/v1/_summary", "servicecode": "DPDP", "enabled": true },
+    { "id": 91006, "name": "DPDP Rights Create", "url": "/upyog-dpdp-service/rights/v1/_create", "servicecode": "DPDP", "enabled": true },
+    { "id": 91007, "name": "DPDP Rights Update", "url": "/upyog-dpdp-service/rights/v1/_update", "servicecode": "DPDP", "enabled": true },
+    { "id": 91008, "name": "DPDP Incident Create", "url": "/upyog-dpdp-service/incident/v1/_create", "servicecode": "DPDP", "enabled": true },
+    { "id": 91009, "name": "DPDP Incident Update", "url": "/upyog-dpdp-service/incident/v1/_update", "servicecode": "DPDP", "enabled": true },
+    { "id": 91010, "name": "DPDP Grievance Update", "url": "/upyog-dpdp-service/grievance/v1/_update", "servicecode": "DPDP", "enabled": true },
+    { "id": 91011, "name": "DPDP Notice Search", "url": "/upyog-dpdp-service/notice/v1/_search", "servicecode": "DPDP", "enabled": true },
+    { "id": 91012, "name": "DPDP Notice Acknowledge", "url": "/upyog-dpdp-service/notice/v1/_acknowledge", "servicecode": "DPDP", "enabled": true },
+    { "id": 91013, "name": "DPDP Nomination Create", "url": "/upyog-dpdp-service/nomination/v1/_create", "servicecode": "DPDP", "enabled": true },
+    { "id": 91014, "name": "DPDP Contact Search", "url": "/upyog-dpdp-service/contact/v1/_search", "servicecode": "DPDP", "enabled": true },
+    { "id": 91015, "name": "DPDP Data Summary", "url": "/upyog-dpdp-service/rights/v1/_create", "servicecode": "DPDP", "enabled": true },
+    { "id": 91016, "name": "DPDP Guardian Create", "url": "/upyog-dpdp-service/guardian/v1/_create", "servicecode": "DPDP", "enabled": true },
+    { "id": 91017, "name": "DPDP Inventory Validate", "url": "/upyog-dpdp-service/inventory/v1/_validate", "servicecode": "DPDP", "enabled": true },
+    { "id": 91018, "name": "DPDP Retention Evaluate", "url": "/upyog-dpdp-service/retention/v1/_evaluate", "servicecode": "DPDP", "enabled": true },
+    { "id": 91019, "name": "DPDP Consent Verify InterService", "url": "/upyog-dpdp-service/consent/v1/_verifyInterService", "servicecode": "DPDP", "enabled": true },
+    { "id": 91020, "name": "DPDP Access Log Search", "url": "/upyog-dpdp-service/audit/v1/_search", "servicecode": "DPDP", "enabled": true }
+  ]
+}

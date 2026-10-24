@@ -1,0 +1,20 @@
+{
+  "tenantId": "pg",
+  "moduleName": "ACCESSCONTROL-ROLEACTIONS-TEST",
+  "roleactions-test": [
+    { "rolecode": "DPDP_ADMIN", "actionid": 91001, "enabled": true },
+    { "rolecode": "DPDP_ADMIN", "actionid": 91002, "enabled": true },
+    { "rolecode": "DPDP_ADMIN", "actionid": 91003, "enabled": true },
+    { "rolecode": "DPO", "actionid": 91005, "enabled": true },
+    { "rolecode": "DPO", "actionid": 91006, "enabled": true },
+    { "rolecode": "DPO", "actionid": 91007, "enabled": true },
+    { "rolecode": "DPO", "actionid": 91008, "enabled": true },
+    { "rolecode": "DPO", "actionid": 91009, "enabled": true },
+    { "rolecode": "DPDP_GRIEVANCE_OFFICER", "actionid": 91010, "enabled": true },
+    { "rolecode": "CITIZEN", "actionid": 91011, "enabled": true },
+    { "rolecode": "CITIZEN", "actionid": 91012, "enabled": true },
+    { "rolecode": "CITIZEN", "actionid": 91013, "enabled": true },
+    { "rolecode": "CITIZEN", "actionid": 91014, "enabled": true },
+    { "rolecode": "CITIZEN", "actionid": 91015, "enabled": true }
+  ]
+}

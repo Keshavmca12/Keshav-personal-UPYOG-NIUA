@@ -1,0 +1,16 @@
+replicaCount: 1
+
+image:
+  repository: upyog-dpdp-service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  port: 8096
+
+env:
+  springProfilesActive: docker
+  mdmsHost: http://egov-mdms:8080
+  userHost: http://egov-user:8080
+
+resources: {}

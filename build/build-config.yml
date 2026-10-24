@@ -1055,6 +1055,14 @@ config:
       - work-dir: "core-services/upyog-draft-service/src/main/resources/db"
         image-name: "upyog-draft-service-db"
 
+  - name: "builds/upyog/core-services/upyog-dpdp-service"
+    build:
+      - work-dir: "core-services/upyog-dpdp-service"
+        image-name: "upyog-dpdp-service"
+        dockerfile: "build/maven/Dockerfile"
+      - work-dir: "core-services/upyog-dpdp-service/src/main/resources/db"
+        image-name: "upyog-dpdp-service-db"
+
   - name: "builds/upyog/dx-services/data-sharing-service-dx"
     build:
       - work-dir: "dx-services/data-sharing-service-dx"

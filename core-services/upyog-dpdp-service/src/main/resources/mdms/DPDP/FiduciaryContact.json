@@ -1,0 +1,10 @@
+[
+  {
+    "tenantId": "pg",
+    "dpoName": "Data Protection Officer",
+    "dpoEmail": "dpo@example.org",
+    "dpoPhone": "+91-0000000000",
+    "grievanceEmail": "privacy@example.org",
+    "boardReportingEmail": "board@example.org"
+  }
+]
