@@ -1,0 +1,216 @@
+serviceMaps:
+  serviceName: upyog-dpdp-service
+  mappings:
+    - version: 1.0
+      name: save-dpdp-consent
+      description: Insert consent
+      fromTopic: save-dpdp-consent
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO ug_dpdp_consent(id, consent_number, tenant_id, data_principal_uuid, fiduciary, application_code, data_category, purpose_code, processing_basis, status, version, source, language, granted_time, withdrawal_time, expiry_time, notice_ref, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: Consent
+          jsonMaps:
+            - jsonPath: $.Consent.id
+            - jsonPath: $.Consent.consentNumber
+            - jsonPath: $.Consent.tenantId
+            - jsonPath: $.Consent.dataPrincipalUuid
+            - jsonPath: $.Consent.fiduciary
+            - jsonPath: $.Consent.applicationCode
+            - jsonPath: $.Consent.dataCategory
+            - jsonPath: $.Consent.purposeCode
+            - jsonPath: $.Consent.processingBasis
+            - jsonPath: $.Consent.status
+            - jsonPath: $.Consent.version
+            - jsonPath: $.Consent.source
+            - jsonPath: $.Consent.language
+            - jsonPath: $.Consent.grantedTime
+            - jsonPath: $.Consent.withdrawalTime
+            - jsonPath: $.Consent.expiryTime
+            - jsonPath: $.Consent.noticeRef
+            - jsonPath: $.Consent.createdBy
+            - jsonPath: $.Consent.lastModifiedBy
+            - jsonPath: $.Consent.createdTime
+            - jsonPath: $.Consent.lastModifiedTime
+    - version: 1.0
+      name: update-dpdp-consent
+      description: Update consent status
+      fromTopic: update-dpdp-consent
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE ug_dpdp_consent SET status = ?, withdrawal_time = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE id = ? AND tenant_id = ?;
+          basePath: Consent
+          jsonMaps:
+            - jsonPath: $.Consent.status
+            - jsonPath: $.Consent.withdrawalTime
+            - jsonPath: $.Consent.lastModifiedBy
+            - jsonPath: $.Consent.lastModifiedTime
+            - jsonPath: $.Consent.id
+            - jsonPath: $.Consent.tenantId
+    - version: 1.0
+      name: save-dpdp-privacy-event
+      description: Immutable privacy event
+      fromTopic: save-dpdp-privacy-event
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO ug_dpdp_privacy_event(id, tenant_id, actor_uuid, action, entity_type, entity_id, application_code, purpose_code, data_category, result, source_ip, detail, createdtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: PrivacyEvent
+          jsonMaps:
+            - jsonPath: $.PrivacyEvent.id
+            - jsonPath: $.PrivacyEvent.tenantId
+            - jsonPath: $.PrivacyEvent.actorUuid
+            - jsonPath: $.PrivacyEvent.action
+            - jsonPath: $.PrivacyEvent.entityType
+            - jsonPath: $.PrivacyEvent.entityId
+            - jsonPath: $.PrivacyEvent.applicationCode
+            - jsonPath: $.PrivacyEvent.purposeCode
+            - jsonPath: $.PrivacyEvent.dataCategory
+            - jsonPath: $.PrivacyEvent.result
+            - jsonPath: $.PrivacyEvent.sourceIp
+            - jsonPath: $.PrivacyEvent.detail
+            - jsonPath: $.PrivacyEvent.createdTime
+    - version: 1.0
+      name: save-dpdp-principal-request
+      description: Insert data-principal rights request
+      fromTopic: save-dpdp-principal-request
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO ug_dpdp_principal_request(id, request_number, tenant_id, data_principal_uuid, request_type, purpose_code, application_code, status, justification, process_instance_id, result_summary, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: PrincipalRequest
+          jsonMaps:
+            - jsonPath: $.PrincipalRequest.id
+            - jsonPath: $.PrincipalRequest.requestNumber
+            - jsonPath: $.PrincipalRequest.tenantId
+            - jsonPath: $.PrincipalRequest.dataPrincipalUuid
+            - jsonPath: $.PrincipalRequest.requestType
+            - jsonPath: $.PrincipalRequest.purposeCode
+            - jsonPath: $.PrincipalRequest.applicationCode
+            - jsonPath: $.PrincipalRequest.status
+            - jsonPath: $.PrincipalRequest.justification
+            - jsonPath: $.PrincipalRequest.processInstanceId
+            - jsonPath: $.PrincipalRequest.resultSummary
+            - jsonPath: $.PrincipalRequest.createdBy
+            - jsonPath: $.PrincipalRequest.lastModifiedBy
+            - jsonPath: $.PrincipalRequest.createdTime
+            - jsonPath: $.PrincipalRequest.lastModifiedTime
+    - version: 1.0
+      name: update-dpdp-principal-request
+      description: Update rights request status
+      fromTopic: update-dpdp-principal-request
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE ug_dpdp_principal_request SET status = ?, result_summary = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE id = ? AND tenant_id = ?;
+          basePath: PrincipalRequest
+          jsonMaps:
+            - jsonPath: $.PrincipalRequest.status
+            - jsonPath: $.PrincipalRequest.resultSummary
+            - jsonPath: $.PrincipalRequest.lastModifiedBy
+            - jsonPath: $.PrincipalRequest.lastModifiedTime
+            - jsonPath: $.PrincipalRequest.id
+            - jsonPath: $.PrincipalRequest.tenantId
+    - version: 1.0
+      name: save-dpdp-scan
+      description: Insert scan job
+      fromTopic: save-dpdp-scan
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO ug_dpdp_scan(id, tenant_id, scan_type, application_code, asset_id, status, started_at, completed_at, finding_count, error_message, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: ScanJob
+          jsonMaps:
+            - jsonPath: $.ScanJob.id
+            - jsonPath: $.ScanJob.tenantId
+            - jsonPath: $.ScanJob.scanType
+            - jsonPath: $.ScanJob.applicationCode
+            - jsonPath: $.ScanJob.assetId
+            - jsonPath: $.ScanJob.status
+            - jsonPath: $.ScanJob.startedAt
+            - jsonPath: $.ScanJob.completedAt
+            - jsonPath: $.ScanJob.findingCount
+            - jsonPath: $.ScanJob.errorMessage
+            - jsonPath: $.ScanJob.createdBy
+            - jsonPath: $.ScanJob.createdBy
+            - jsonPath: $.ScanJob.createdTime
+            - jsonPath: $.ScanJob.createdTime
+    - version: 1.0
+      name: update-dpdp-scan
+      description: Update scan job
+      fromTopic: update-dpdp-scan
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE ug_dpdp_scan SET status = ?, completed_at = ?, finding_count = ?, error_message = ?, lastmodifiedtime = ? WHERE id = ? AND tenant_id = ?;
+          basePath: ScanJob
+          jsonMaps:
+            - jsonPath: $.ScanJob.status
+            - jsonPath: $.ScanJob.completedAt
+            - jsonPath: $.ScanJob.findingCount
+            - jsonPath: $.ScanJob.errorMessage
+            - jsonPath: $.ScanJob.createdTime
+            - jsonPath: $.ScanJob.id
+            - jsonPath: $.ScanJob.tenantId
+    - version: 1.0
+      name: save-dpdp-finding
+      description: Insert compliance finding
+      fromTopic: save-dpdp-finding
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO ug_dpdp_finding(id, tenant_id, scan_id, rule_code, category, severity, status, application_code, asset_name, field_name, classification, title, description, recommendation, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: Finding
+          jsonMaps:
+            - jsonPath: $.Finding.id
+            - jsonPath: $.Finding.tenantId
+            - jsonPath: $.Finding.scanId
+            - jsonPath: $.Finding.ruleCode
+            - jsonPath: $.Finding.category
+            - jsonPath: $.Finding.severity
+            - jsonPath: $.Finding.status
+            - jsonPath: $.Finding.applicationCode
+            - jsonPath: $.Finding.assetName
+            - jsonPath: $.Finding.fieldName
+            - jsonPath: $.Finding.classification
+            - jsonPath: $.Finding.title
+            - jsonPath: $.Finding.description
+            - jsonPath: $.Finding.recommendation
+            - jsonPath: $.Finding.createdBy
+            - jsonPath: $.Finding.createdBy
+            - jsonPath: $.Finding.createdTime
+            - jsonPath: $.Finding.createdTime
+    - version: 1.0
+      name: save-dpdp-incident
+      description: Insert privacy incident
+      fromTopic: save-dpdp-incident
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO ug_dpdp_privacy_incident(id, incident_number, tenant_id, application_code, data_category, incident_type, status, severity, discovery_time, affected_records, containment_action, notification_status, description, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: PrivacyIncident
+          jsonMaps:
+            - jsonPath: $.PrivacyIncident.id
+            - jsonPath: $.PrivacyIncident.incidentNumber
+            - jsonPath: $.PrivacyIncident.tenantId
+            - jsonPath: $.PrivacyIncident.applicationCode
+            - jsonPath: $.PrivacyIncident.dataCategory
+            - jsonPath: $.PrivacyIncident.incidentType
+            - jsonPath: $.PrivacyIncident.status
+            - jsonPath: $.PrivacyIncident.severity
+            - jsonPath: $.PrivacyIncident.discoveryTime
+            - jsonPath: $.PrivacyIncident.affectedRecords
+            - jsonPath: $.PrivacyIncident.containmentAction
+            - jsonPath: $.PrivacyIncident.notificationStatus
+            - jsonPath: $.PrivacyIncident.description
+            - jsonPath: $.PrivacyIncident.createdBy
+            - jsonPath: $.PrivacyIncident.createdBy
+            - jsonPath: $.PrivacyIncident.createdTime
+            - jsonPath: $.PrivacyIncident.lastModifiedTime
+    - version: 1.0
+      name: update-dpdp-incident
+      description: Update privacy incident
+      fromTopic: update-dpdp-incident
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE ug_dpdp_privacy_incident SET status = ?, containment_action = ?, notification_status = ?, lastmodifiedtime = ? WHERE id = ? AND tenant_id = ?;
+          basePath: PrivacyIncident
+          jsonMaps:
+            - jsonPath: $.PrivacyIncident.status
+            - jsonPath: $.PrivacyIncident.containmentAction
+            - jsonPath: $.PrivacyIncident.notificationStatus
+            - jsonPath: $.PrivacyIncident.lastModifiedTime
+            - jsonPath: $.PrivacyIncident.id
+            - jsonPath: $.PrivacyIncident.tenantId

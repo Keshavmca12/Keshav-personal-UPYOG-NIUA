@@ -1,0 +1,16 @@
+[
+  {
+    "purposeCode": "OPTIONAL_ALERTS",
+    "locale": "en_IN",
+    "version": "1.0",
+    "title": "Optional alerts consent notice",
+    "body": "We process your contact details to send optional service alerts when you opt in."
+  },
+  {
+    "purposeCode": "PROPERTY_TAX_SERVICE",
+    "locale": "en_IN",
+    "version": "1.0",
+    "title": "Property tax processing notice",
+    "body": "Personal data is processed to deliver statutory property tax services."
+  }
+]

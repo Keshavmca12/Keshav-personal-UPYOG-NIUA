@@ -1,0 +1,20 @@
+[
+  {
+    "applicationCode": "PT",
+    "assetName": "property",
+    "fields": [
+      { "field": "ownerName", "category": "PERSONAL" },
+      { "field": "mobileNumber", "category": "PERSONAL" },
+      { "field": "propertyId", "category": "INTERNAL" }
+    ]
+  },
+  {
+    "applicationCode": "USER",
+    "assetName": "user",
+    "fields": [
+      { "field": "name", "category": "PERSONAL" },
+      { "field": "mobileNumber", "category": "PERSONAL" },
+      { "field": "emailId", "category": "PERSONAL" }
+    ]
+  }
+]

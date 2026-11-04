@@ -1,0 +1,5 @@
+[
+  { "code": "PROPERTY_TAX_DEFAULT", "name": "Property tax statutory retention", "retentionDays": 2555, "action": "SOFT_DELETE", "basis": "STATUTORY_FUNCTION" },
+  { "code": "TRADE_LICENSE_DEFAULT", "name": "Trade licence statutory retention", "retentionDays": 2555, "action": "SOFT_DELETE", "basis": "STATUTORY_FUNCTION" },
+  { "code": "ALERTS_DEFAULT", "name": "Optional alerts retention", "retentionDays": 365, "action": "SOFT_DELETE", "basis": "CONSENT" }
+]
