@@ -97,6 +97,7 @@ class UpyogMcpClient:
             # Gateway validates Auth-Token on /upyog-mcp-server/mcp; MCP forwards it on downstream calls.
             "Auth-Token": auth_token,
             "auth-token": auth_token,
+            "x-user-uuid": os.environ.get("UPYOG_USER_UUID", "test-user-123"),
             "x-correlation-id": str(uuid.uuid4()),
         }
         if session_id:

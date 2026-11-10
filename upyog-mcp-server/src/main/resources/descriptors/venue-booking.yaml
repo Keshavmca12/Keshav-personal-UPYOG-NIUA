@@ -1,6 +1,6 @@
 id: venue-booking
 displayName: Community hall and venue booking
-description: Search and create venue bookings. Cancellation is not available in this release.
+description: Search and create venue bookings. Cancellation is not available in this release. Use tenantId "pg" (state level) for lookup_master.
 allowedRolesHint:
   - CITIZEN
   - CHB_CEMP
@@ -10,7 +10,7 @@ masters:
   - module: CHB
     name: CommunityHalls
   - module: CHB
-    name: VenueType
+    name: Venues
   - module: CHB
     name: Purpose
   - module: CHB
@@ -86,7 +86,7 @@ operations:
     inputSchema:
       type: object
       additionalProperties: false
-      required: [tenantId, purpose, specialCategory, bookingSlotDetails]
+      required: [tenantId, venueCode, venueType, purpose, purposeDescription, specialCategory, bookingSlotDetails, applicantDetail, address, documents]
       properties:
         tenantId:
           type: string
@@ -110,13 +110,15 @@ operations:
           properties:
             category:
               type: string
+        purposeDescription:
+          type: string
         bookingSlotDetails:
           type: array
           minItems: 1
           items:
             type: object
             additionalProperties: false
-            required: [bookingDate, bookingFromTime, bookingToTime]
+            required: [bookingDate, bookingFromTime, bookingToTime, unitCode, capacity, status]
             properties:
               bookingDate:
                 type: string
@@ -126,15 +128,41 @@ operations:
                 type: string
               unitCode:
                 type: string
+              capacity:
+                type: string
+              status:
+                type: string 
         applicantDetail:
           type: object
           additionalProperties: false
+          required: [applicantName, applicantMobileNo, applicantEmailId, accountNumber, ifscCode, bankName, bankBranchName, accountHolderName]
           properties:
             applicantName:
               type: string
+              maxLength: 100
             applicantMobileNo:
               type: string
+              minLength: 10
+              maxLength: 10
             applicantEmailId:
+              type: string
+            applicantAlternateMobileNo:
+              type: string
+            accountNumber:
+              type: string
+              minLength: 8
+              maxLength: 18
+            ifscCode:
+              type: string
+            bankName:
+              type: string
+            bankBranchName:
+              type: string
+            accountHolderName:
+              type: string
+            refundType:
+              type: string
+            refundStatus:
               type: string
         documents:
           type: array
@@ -151,6 +179,32 @@ operations:
                 type: string
               contentBase64:
                 type: string
+        address:
+          type: object
+          additionalProperties: false
+          required: [city, cityCode, locality, localityCode, pincode]
+          properties:
+            city:
+              type: string
+            cityCode:
+              type: string
+            locality:
+              type: string
+            localityCode:
+              type: string
+            pincode:
+              type: string
+            doorNo:
+              type: string
+            houseNo:
+              type: string
+            streetName:
+              type: string
+            addressLine1:
+              type: string
+            landmark:
+              type: string
+
     requestBody:
       venueBookingApplication:
         tenantId:
@@ -167,6 +221,12 @@ operations:
           "$payload": bookingSlotDetails
         applicantDetail:
           "$payload": applicantDetail
+        purposeDescription:
+          "$payload": purposeDescription
+        address:
+          "$payload": address
+        bookingStatus:
+          "$constant": "BOOKING_CREATED"
     response:
       listPath: venueBookingApplication
       keep:
@@ -183,5 +243,8 @@ operations:
           category: General
         bookingSlotDetails:
           - bookingDate: "2026-10-20"
-            bookingFromTime: "10:00:00"
-            bookingToTime: "14:00:00"
+            bookingFromTime: "10:00"
+            bookingToTime: "14:00"
+            unitCode: "HALL-1"
+            capacity: "500"
+            status: "BOOKING_CREATED"    
