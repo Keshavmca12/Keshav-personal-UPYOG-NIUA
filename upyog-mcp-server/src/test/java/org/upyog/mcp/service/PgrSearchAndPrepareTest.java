@@ -71,13 +71,15 @@ class PgrSearchAndPrepareTest {
         String json = new ObjectMapper().writeValueAsString(result);
         assertTrue(json.contains("PGR-1"));
         assertFalse(json.contains("9999999999"));
+        
+        // Correlation ID is forwarded in RequestInfo.correlationId (request body) rather than as
+        // an 'x-correlation-id' HTTP header, because the NIUA API Gateway (Zuul) rejects inbound
+        // 'x-correlation-id' headers with HTTP 500 downstream.
         verify(postRequestedFor(urlPathEqualTo("/pgr-services/v2/request/_search"))
                 .withQueryParam("tenantId", equalTo("pg.citya"))
                 .withRequestBody(containing("\"authToken\":\"token-1\""))
                 .withRequestBody(containing("\"correlationId\":\"corr-1\"")));
     }
-                // Correlation ID is forwarded in RequestInfo.correlationId (body) rather than an HTTP header,
-                // because NIUA API Gateway (Zuul) rejects inbound 'x-correlation-id' headers with HTTP 500.
 
 
     @Test
