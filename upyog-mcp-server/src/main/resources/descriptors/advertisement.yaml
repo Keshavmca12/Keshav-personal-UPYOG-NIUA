@@ -1,6 +1,6 @@
 id: advertisement
 displayName: Advertisement
-description: Advertisement booking search and create.
+description: Advertisement booking search and create. Use tenantId "pg" (state level) for lookup_master.
 allowedRolesHint:
   - CITIZEN
   - ADS_CEMP
@@ -78,7 +78,7 @@ operations:
     inputSchema:
       type: object
       additionalProperties: false
-      required: [tenantId, cartDetails]
+      required: [tenantId, cartDetails, applicantDetail, address]
       properties:
         tenantId:
           type: string
@@ -90,6 +90,7 @@ operations:
           items:
             type: object
             additionalProperties: false
+            required: [addType, location, faceArea, nightLight, bookingDate, bookingFromTime, bookingToTime ]
             properties:
               addType:
                 type: string
@@ -105,9 +106,12 @@ operations:
                 type: string
               bookingToTime:
                 type: string
+              status:
+                type: string
         applicantDetail:
           type: object
           additionalProperties: false
+          required: [applicantName, applicantMobileNo, applicantEmailId]
           properties:
             applicantName:
               type: string
@@ -115,15 +119,32 @@ operations:
               type: string
             applicantEmailId:
               type: string
+            applicantAlternateMobileNo:
+              type: string
         address:
           type: object
           additionalProperties: false
+          required: [addressLine1, city, pincode, houseNo, streetName, landmark, cityCode, localityCode, locality ]
           properties:
             addressLine1:
               type: string
             city:
               type: string
             pincode:
+              type: string
+            houseNo:
+              type: string
+            streetName:
+              type: string
+            addressLine2:
+              type: string
+            landmark:
+              type: string
+            cityCode:
+              type: string
+            locality: 
+              type: string
+            localityCode:
               type: string
         documents:
           type: array
@@ -140,6 +161,10 @@ operations:
                 type: string
               contentBase64:
                 type: string
+              fileStoreId:
+                type: string
+              documentUid:
+                type: string
     requestBody:
       bookingApplication:
         tenantId:
@@ -150,6 +175,8 @@ operations:
           "$payload": applicantDetail
         address:
           "$payload": address
+        bookingStatus:
+          "$constant": "BOOKING_CREATED"
       isDraftApplication:
         "$constant": false
     response:
@@ -160,7 +187,7 @@ operations:
         - bookingStatus
         - tenantId
     examples:
-      - tenantId: pg.citya
+      - tenantId: pg
         cartDetails:
           - addType: Hoarding
             location: Market

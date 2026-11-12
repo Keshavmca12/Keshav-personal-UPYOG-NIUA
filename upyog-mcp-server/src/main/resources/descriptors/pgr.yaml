@@ -1,6 +1,6 @@
 id: pgr
 displayName: Grievance
-description: Public grievance registration and search.
+description: Public grievance registration and search. Use tenantId "pg" (state level) for lookup_master.
 allowedRolesHint:
   - CITIZEN
   - CSR
@@ -99,27 +99,54 @@ operations:
           maxLength: 128
         description:
           type: string
-          maxLength: 1000
+          maxLength: 4000
         priority:
           type: string
           enum: [LOW, MEDIUM, HIGH]
+        additionalDetail:
+          type: object 
+          additionalProperties: false     
         address:
           type: object
           additionalProperties: false
-          required: [locality]
+          required: [city, district, region, state, locality, geoLocation]
           properties:
             tenantId:
               type: string
+              maxLength: 128
             doorNo:
               type: string
+              maxLength: 128
+            plotNo:
+              type: string
+              maxLength: 256
+            buildingName: 
+              type: string
+              maxLength: 1024
             street:
               type: string
+              maxLength: 1024
             city:
               type: string
+              maxLength: 512
+            district:
+              type: string
+              maxLength: 256
+            region:
+              type: string
+              maxLength: 256
+            state:
+              type: string
+              maxLength: 256
+            country:
+              type: string
+              maxLength: 512
             pincode:
               type: string
+              maxLength: 16
             landmark:
               type: string
+              maxLength: 1024
             locality:
               type: object
               additionalProperties: false
@@ -127,8 +154,19 @@ operations:
               properties:
                 code:
                   type: string
+                  maxLength: 128
                 name:
                   type: string
+                  maxLength: 256
+            geoLocation:
+              type: object
+              additionalProperties: false
+              description: "GPS location container. Pass empty object {} if coordinates are not available."
+              properties:
+                latitude:
+                  type: number 
+                longitude:
+                  type: number
         documents:
           type: array
           items:
@@ -154,6 +192,8 @@ operations:
           "$payload": description
         priority:
           "$payload": priority
+        additionalDetail:
+          "$payload": additionalDetail
         address:
           "$payload": address
         accountId:
@@ -176,5 +216,10 @@ operations:
         priority: HIGH
         description: Lane near the park is not cleaned
         address:
+          city: City A
+          district: District A
+          region: Region A
+          state: State
           locality:
             code: JLC478
+          geoLocation: {}
