@@ -63,7 +63,7 @@ operations:
       offset:
         "$page": offset
     response:
-      listPath: venueBookingApplication
+      listPath: hallsBookingApplication
       keep:
         - bookingNo
         - bookingId
@@ -71,8 +71,8 @@ operations:
         - tenantId
         - venueCode
     examples:
-      - tenantId: pg.citya
-        bookingNo: CHB-555
+      - tenantId: pg.mohali
+        bookingNo: CHB-1508-001015
   create:
     type: WRITE
     description: Create a venue booking. Slot and purpose codes must come from lookup_master.
@@ -166,6 +166,8 @@ operations:
               type: string
         documents:
           type: array
+          minItems: 3
+          description: "Must provide at least 3 documents: Identity Proof, Address Proof, and Bank Account Proof."
           items:
             type: object
             additionalProperties: false
@@ -173,6 +175,7 @@ operations:
             properties:
               documentType:
                 type: string
+                description: Must be a valid document code from MDMS (e.g., APPLICANT.IDENTITYPROOF.AADHAAR, APPLICANT.ADDRESSPROOF.ELECTRICITYBILL, APPLICANT.BANKACCOUNTPROOF.BANKPASSBOOK)"
               fileName:
                 type: string
               contentType:
@@ -228,23 +231,25 @@ operations:
         bookingStatus:
           "$constant": "BOOKING_CREATED"
     response:
-      listPath: venueBookingApplication
+      listPath: hallsBookingApplication
       keep:
         - bookingNo
         - bookingId
         - bookingStatus
         - tenantId
     examples:
-      - tenantId: pg.citya
-        venueCode: HALL-1
+      - tenantId: pg.mohali
+        venueCode: CENTRAL_PARK
+        venueType: PARKS
         purpose:
           purpose: Marriage
+        purposeDescription: Family gathering
         specialCategory:
-          category: General
+          category: None
         bookingSlotDetails:
-          - bookingDate: "2026-10-20"
-            bookingFromTime: "10:00"
-            bookingToTime: "14:00"
-            unitCode: "HALL-1"
-            capacity: "500"
-            status: "BOOKING_CREATED"    
+          - bookingDate: "2026-12-15"
+            bookingFromTime: "06:00"
+            bookingToTime: "12:00"
+            unitCode: "CP_Park_Section-2001"
+            capacity: ""
+            status: "BOOKING_CREATED"
