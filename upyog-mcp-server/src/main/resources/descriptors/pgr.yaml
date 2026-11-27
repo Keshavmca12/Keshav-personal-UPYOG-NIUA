@@ -1,6 +1,6 @@
 id: pgr
 displayName: Grievance
-description: Public grievance registration and search. Use tenantId "pg" (state level) for lookup_master.
+description: Public grievance registration and search.
 allowedRolesHint:
   - CITIZEN
   - CSR

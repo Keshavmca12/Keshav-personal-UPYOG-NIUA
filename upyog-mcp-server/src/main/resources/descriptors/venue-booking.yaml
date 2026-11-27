@@ -1,6 +1,6 @@
 id: venue-booking
 displayName: Community hall and venue booking
-description: Search and create venue bookings. Cancellation is not available in this release. Use tenantId "pg" (state level) for lookup_master.
+description: Search and create venue bookings. Cancellation is not available in this release.
 allowedRolesHint:
   - CITIZEN
   - CHB_CEMP

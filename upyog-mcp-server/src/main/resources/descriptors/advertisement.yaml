@@ -1,6 +1,6 @@
 id: advertisement
 displayName: Advertisement
-description: Advertisement booking search and create. Use tenantId "pg" (state level) for lookup_master.
+description: Advertisement booking search and create.
 allowedRolesHint:
   - CITIZEN
   - ADS_CEMP
