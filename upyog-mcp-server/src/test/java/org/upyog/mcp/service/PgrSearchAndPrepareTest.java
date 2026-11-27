@@ -71,11 +71,16 @@ class PgrSearchAndPrepareTest {
         String json = new ObjectMapper().writeValueAsString(result);
         assertTrue(json.contains("PGR-1"));
         assertFalse(json.contains("9999999999"));
+        
+        // Correlation ID is forwarded in RequestInfo.correlationId (request body) rather than as
+        // an 'x-correlation-id' HTTP header, because the NIUA API Gateway (Zuul) rejects inbound
+        // 'x-correlation-id' headers with HTTP 500 downstream.
         verify(postRequestedFor(urlPathEqualTo("/pgr-services/v2/request/_search"))
                 .withQueryParam("tenantId", equalTo("pg.citya"))
                 .withRequestBody(containing("\"authToken\":\"token-1\""))
-                .withHeader("x-correlation-id", containing("corr-1")));
+                .withRequestBody(containing("\"correlationId\":\"corr-1\"")));
     }
+
 
     @Test
     void prepareDoesNotCallCreate() throws Exception {
@@ -86,7 +91,22 @@ class PgrSearchAndPrepareTest {
         McpOperations operations = operations(server.port());
         UserContextHolder.set(citizen());
         Map<String, Object> prepared = operations.prepare("pgr", "create", new ObjectMapper().readTree("""
-                {"tenantId":"pg.citya","serviceCode":"Garbage","priority":"HIGH","description":"lane is dirty","address":{"locality":{"code":"JLC478"}}}
+                {
+                  "tenantId": "pg.citya",
+                  "serviceCode": "Garbage",
+                  "priority": "HIGH",
+                  "description": "lane is dirty",
+                  "address": {
+                    "city": "City A",
+                    "district": "District A",
+                    "region": "Region A",
+                    "state": "State",
+                    "locality": {
+                      "code": "JLC478"
+                    },
+                    "geoLocation": {}
+                  }
+                }
                 """));
         assertEquals(true, prepared.get("readyForConfirmation"));
         assertEquals(0, posts.get());

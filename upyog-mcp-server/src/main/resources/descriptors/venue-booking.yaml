@@ -10,7 +10,7 @@ masters:
   - module: CHB
     name: CommunityHalls
   - module: CHB
-    name: VenueType
+    name: Venues
   - module: CHB
     name: Purpose
   - module: CHB
@@ -63,7 +63,7 @@ operations:
       offset:
         "$page": offset
     response:
-      listPath: venueBookingApplication
+      listPath: hallsBookingApplication
       keep:
         - bookingNo
         - bookingId
@@ -71,8 +71,8 @@ operations:
         - tenantId
         - venueCode
     examples:
-      - tenantId: pg.citya
-        bookingNo: CHB-555
+      - tenantId: pg.mohali
+        bookingNo: CHB-1508-001015
   create:
     type: WRITE
     description: Create a venue booking. Slot and purpose codes must come from lookup_master.
@@ -86,7 +86,7 @@ operations:
     inputSchema:
       type: object
       additionalProperties: false
-      required: [tenantId, purpose, specialCategory, bookingSlotDetails]
+      required: [tenantId, venueCode, venueType, purpose, purposeDescription, specialCategory, bookingSlotDetails, applicantDetail, address, documents]
       properties:
         tenantId:
           type: string
@@ -110,13 +110,15 @@ operations:
           properties:
             category:
               type: string
+        purposeDescription:
+          type: string
         bookingSlotDetails:
           type: array
           minItems: 1
           items:
             type: object
             additionalProperties: false
-            required: [bookingDate, bookingFromTime, bookingToTime]
+            required: [bookingDate, bookingFromTime, bookingToTime, unitCode, capacity, status]
             properties:
               bookingDate:
                 type: string
@@ -126,18 +128,46 @@ operations:
                 type: string
               unitCode:
                 type: string
+              capacity:
+                type: string
+              status:
+                type: string 
         applicantDetail:
           type: object
           additionalProperties: false
+          required: [applicantName, applicantMobileNo, applicantEmailId, accountNumber, ifscCode, bankName, bankBranchName, accountHolderName]
           properties:
             applicantName:
               type: string
+              maxLength: 100
             applicantMobileNo:
               type: string
+              minLength: 10
+              maxLength: 10
             applicantEmailId:
+              type: string
+            applicantAlternateMobileNo:
+              type: string
+            accountNumber:
+              type: string
+              minLength: 8
+              maxLength: 18
+            ifscCode:
+              type: string
+            bankName:
+              type: string
+            bankBranchName:
+              type: string
+            accountHolderName:
+              type: string
+            refundType:
+              type: string
+            refundStatus:
               type: string
         documents:
           type: array
+          minItems: 3
+          description: "Must provide at least 3 documents: Identity Proof, Address Proof, and Bank Account Proof."
           items:
             type: object
             additionalProperties: false
@@ -145,12 +175,39 @@ operations:
             properties:
               documentType:
                 type: string
+                description: Must be a valid document code from MDMS (e.g., APPLICANT.IDENTITYPROOF.AADHAAR, APPLICANT.ADDRESSPROOF.ELECTRICITYBILL, APPLICANT.BANKACCOUNTPROOF.BANKPASSBOOK)"
               fileName:
                 type: string
               contentType:
                 type: string
               contentBase64:
                 type: string
+        address:
+          type: object
+          additionalProperties: false
+          required: [city, cityCode, locality, localityCode, pincode]
+          properties:
+            city:
+              type: string
+            cityCode:
+              type: string
+            locality:
+              type: string
+            localityCode:
+              type: string
+            pincode:
+              type: string
+            doorNo:
+              type: string
+            houseNo:
+              type: string
+            streetName:
+              type: string
+            addressLine1:
+              type: string
+            landmark:
+              type: string
+
     requestBody:
       venueBookingApplication:
         tenantId:
@@ -167,21 +224,32 @@ operations:
           "$payload": bookingSlotDetails
         applicantDetail:
           "$payload": applicantDetail
+        purposeDescription:
+          "$payload": purposeDescription
+        address:
+          "$payload": address
+        bookingStatus:
+          "$constant": "BOOKING_CREATED"
     response:
-      listPath: venueBookingApplication
+      listPath: hallsBookingApplication
       keep:
         - bookingNo
         - bookingId
         - bookingStatus
         - tenantId
     examples:
-      - tenantId: pg.citya
-        venueCode: HALL-1
+      - tenantId: pg.mohali
+        venueCode: CENTRAL_PARK
+        venueType: PARKS
         purpose:
           purpose: Marriage
+        purposeDescription: Family gathering
         specialCategory:
-          category: General
+          category: None
         bookingSlotDetails:
-          - bookingDate: "2026-10-20"
-            bookingFromTime: "10:00:00"
-            bookingToTime: "14:00:00"
+          - bookingDate: "2026-12-15"
+            bookingFromTime: "06:00"
+            bookingToTime: "12:00"
+            unitCode: "CP_Park_Section-2001"
+            capacity: ""
+            status: "BOOKING_CREATED"

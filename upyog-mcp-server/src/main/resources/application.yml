@@ -1,5 +1,5 @@
 server:
-  port: 8088
+  port: ${SERVER_PORT:8080}
   shutdown: graceful
 
 spring:
@@ -75,7 +75,7 @@ upyog:
     request-info-api-id: ${UPYOG_MCP_REQUEST_INFO_API_ID:Rainmaker}
     user-session-tenant-id: ${UPYOG_MCP_USER_SESSION_TENANT_ID:pg}
     redis:
-      enabled: ${REDIS_ENABLED:false}
+      enabled: ${REDIS_ENABLED:true}
       uri: ${REDIS_URI:redis://localhost:6379}
     allowed-gateway-prefixes:
       - /pgr-services/

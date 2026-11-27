@@ -116,8 +116,11 @@ public class RestGatewayClient implements GatewayClient {
                         }
                         return builder.build();
                     })
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("x-correlation-id", correlation());
+                    .contentType(MediaType.APPLICATION_JSON);
+                    // .header("x-correlation-id", correlation());
+                    // Commented out: NIUA API Gateway (Zuul) rejects inbound 'x-correlation-id' headers with HTTP 500.
+
+
             // Inject Auth-Token for gateway RBAC on downstream service calls.
             // Suppressed for /user/_search — the UI curl proves auth goes only in RequestInfo.authToken body.
             if (injectAuthToken) {
@@ -187,7 +190,7 @@ public class RestGatewayClient implements GatewayClient {
                             .queryParam("module", module)
                             .build())
                     .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .header("x-correlation-id", correlation())
+                    // .header("x-correlation-id", correlation()) NIUA API Gateway (Zuul) rejects inbound 'x-correlation-id' headers with HTTP 500.)
                     .body(multipart)
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, (request, response) -> {
