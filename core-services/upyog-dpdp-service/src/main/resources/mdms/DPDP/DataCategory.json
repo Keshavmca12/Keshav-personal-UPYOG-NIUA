@@ -1,0 +1,6 @@
+[
+  { "code": "PERSONAL", "name": "Personal data", "risk": "MEDIUM" },
+  { "code": "HIGH_RISK_PERSONAL", "name": "High-risk personal data", "risk": "CRITICAL" },
+  { "code": "FINANCIAL", "name": "Financial data", "risk": "HIGH" },
+  { "code": "INTERNAL", "name": "Internal operational identifier", "risk": "LOW" }
+]

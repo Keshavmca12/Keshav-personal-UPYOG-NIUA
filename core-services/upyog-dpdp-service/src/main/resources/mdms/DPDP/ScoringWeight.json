@@ -1,0 +1,16 @@
+[
+  { "type": "SEVERITY", "code": "CRITICAL", "weight": 25 },
+  { "type": "SEVERITY", "code": "HIGH", "weight": 15 },
+  { "type": "SEVERITY", "code": "MEDIUM", "weight": 8 },
+  { "type": "SEVERITY", "code": "LOW", "weight": 3 },
+  { "type": "CATEGORY", "code": "CLASSIFICATION", "weight": 0.10 },
+  { "type": "CATEGORY", "code": "CONSENT", "weight": 0.10 },
+  { "type": "CATEGORY", "code": "PURPOSE", "weight": 0.08 },
+  { "type": "CATEGORY", "code": "MINIMIZATION", "weight": 0.08 },
+  { "type": "CATEGORY", "code": "RETENTION", "weight": 0.10 },
+  { "type": "CATEGORY", "code": "ENCRYPTION", "weight": 0.12 },
+  { "type": "CATEGORY", "code": "API_SECURITY", "weight": 0.12 },
+  { "type": "CATEGORY", "code": "ACCESS_CONTROL", "weight": 0.12 },
+  { "type": "CATEGORY", "code": "AUDIT", "weight": 0.10 },
+  { "type": "CATEGORY", "code": "INCIDENT", "weight": 0.08 }
+]

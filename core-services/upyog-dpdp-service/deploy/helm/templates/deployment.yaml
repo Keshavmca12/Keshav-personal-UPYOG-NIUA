@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "upyog-dpdp-service.fullname" . | default "upyog-dpdp-service" }}
+  labels:
+    app: upyog-dpdp-service
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: upyog-dpdp-service
+  template:
+    metadata:
+      labels:
+        app: upyog-dpdp-service
+    spec:
+      containers:
+        - name: upyog-dpdp-service
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.env.springProfilesActive | quote }}
+            - name: EGOV_MDMS_HOST
+              value: {{ .Values.env.mdmsHost | quote }}
+            - name: EGOV_USER_HOST
+              value: {{ .Values.env.userHost | quote }}

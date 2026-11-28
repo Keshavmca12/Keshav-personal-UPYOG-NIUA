@@ -1,0 +1,74 @@
+[
+  {
+    "code": "DPDP-DATA-001",
+    "name": "Personal data must have classification",
+    "category": "CLASSIFICATION",
+    "severity": "HIGH",
+    "enabled": true,
+    "condition": { "all": [{ "equals": { "path": "$.personalData", "value": true } }, { "isNull": { "path": "$.classification" } }] },
+    "recommendation": "Classify the data field using DPDP.FieldClassification."
+  },
+  {
+    "code": "DPDP-RET-001",
+    "name": "Personal data must have a retention policy",
+    "category": "RETENTION",
+    "severity": "HIGH",
+    "enabled": true,
+    "condition": { "all": [{ "equals": { "path": "$.personalData", "value": true } }, { "isNull": { "path": "$.retentionPolicy" } }] },
+    "recommendation": "Attach a configured retention policy."
+  },
+  {
+    "code": "DPDP-API-001",
+    "name": "Personal-data endpoints must authenticate",
+    "category": "API_SECURITY",
+    "severity": "CRITICAL",
+    "enabled": true,
+    "condition": { "all": [{ "equals": { "path": "$.personalDataEndpoint", "value": true } }, { "equals": { "path": "$.authentication", "value": false } }] },
+    "recommendation": "Require authentication on personal-data APIs."
+  },
+  {
+    "code": "DPDP-ENC-001",
+    "name": "High-risk personal data must be protected",
+    "category": "ENCRYPTION",
+    "severity": "CRITICAL",
+    "enabled": true,
+    "condition": { "all": [{ "equals": { "path": "$.highRiskPersonal", "value": true } }, { "equals": { "path": "$.encrypted", "value": false } }] },
+    "recommendation": "Apply the platform-approved encryption mechanism from egov-enc-service."
+  },
+  {
+    "code": "DPDP-CNS-001",
+    "name": "Consent required when basis is CONSENT",
+    "category": "CONSENT",
+    "severity": "HIGH",
+    "enabled": true,
+    "condition": { "all": [{ "equals": { "path": "$.processingBasis", "value": "CONSENT" } }, { "equals": { "path": "$.consentPresent", "value": false } }] },
+    "recommendation": "Capture purpose-specific consent or change the configured processing basis."
+  },
+  {
+    "code": "DPDP-PUR-001",
+    "name": "Processing must declare a purpose",
+    "category": "PURPOSE",
+    "severity": "HIGH",
+    "enabled": true,
+    "condition": { "all": [{ "equals": { "path": "$.personalData", "value": true } }, { "isNull": { "path": "$.purpose" } }] },
+    "recommendation": "Bind the processing activity to a configured purpose."
+  },
+  {
+    "code": "DPDP-MIN-001",
+    "name": "Unjustified extra field",
+    "category": "MINIMIZATION",
+    "severity": "MEDIUM",
+    "enabled": true,
+    "condition": { "all": [{ "equals": { "path": "$.personalData", "value": true } }, { "equals": { "path": "$.required", "value": false } }, { "equals": { "path": "$.justified", "value": false } }] },
+    "recommendation": "Remove the field or record a justification in ApplicationPolicy."
+  },
+  {
+    "code": "DPDP-LOG-001",
+    "name": "Raw PII must not appear in logs",
+    "category": "AUDIT",
+    "severity": "CRITICAL",
+    "enabled": true,
+    "condition": { "all": [{ "equals": { "path": "$.piiInLog", "value": true } }] },
+    "recommendation": "Mask the field before logging."
+  }
+]

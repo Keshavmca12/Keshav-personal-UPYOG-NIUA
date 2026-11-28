@@ -1,0 +1,23 @@
+ServiceMaps:
+  serviceName: upyog-dpdp-service
+  version: 1.0.0
+  mappings:
+    - topic: dpdp.rights.v1
+      configKey: INDEX
+      indexes:
+        - name: dpdp-rights
+          type: dpdp-rights
+          id: $.PrincipalRequest.id, $.PrincipalRequest.tenantId
+          isBulk: false
+          jsonPath: $
+          timeStampField: $.PrincipalRequest.createdTime
+          fieldsToBeMasked: ["$.PrincipalRequest.dataPrincipalUuid"]
+    - topic: dpdp.incident.v1
+      configKey: INDEX
+      indexes:
+        - name: dpdp-incidents
+          type: dpdp-incidents
+          id: $.PrivacyIncident.id, $.PrivacyIncident.tenantId
+          isBulk: false
+          jsonPath: $
+          timeStampField: $.PrivacyIncident.createdTime
